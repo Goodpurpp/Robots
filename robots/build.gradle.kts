@@ -1,3 +1,5 @@
+import java.util.Map
+
 plugins {
     id("java")
 }
@@ -16,4 +18,20 @@ repositories {
 
 dependencies {
 
+}
+
+tasks.compileJava {
+    options.encoding = "UTF-8"
+}
+
+tasks.jar {
+    manifest {
+        attributes(Map.of("Main-class", "gui.RobotsProgram"))
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
 }
