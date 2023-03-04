@@ -20,7 +20,6 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     {
         super("Протокол работы", true, true, true, true);
         this.logSource = logSource;
-        this.logSource.registerListener(this);
         logContent = new TextArea("");
         logContent.setSize(200, 500);
         
@@ -34,9 +33,10 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     private void updateLogContent()
     {
         StringBuilder content = new StringBuilder();
-        for (LogEntry entry : logSource.all())
-        {
-            content.append(entry.getMessage()).append("\n");
+        try (LogWindowSource.LogWindowListener logWindowListener = logSource.registerListener(this)) {
+            for (LogEntry logEntry : logSource.all()) {
+                content.append(logEntry.getMessage()).append("\n");
+            }
         }
         logContent.setText(content.toString());
         logContent.invalidate();
