@@ -26,7 +26,7 @@ tasks.compileJava {
 
 tasks.jar {
     manifest {
-        attributes(Map.of("Main-class", "gui.RobotsProgram"))
+        attributes(Map.of("Main-class", "robots.RobotsProgram"))
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)

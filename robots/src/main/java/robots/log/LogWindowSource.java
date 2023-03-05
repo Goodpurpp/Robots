@@ -1,4 +1,4 @@
-package log;
+package robots.log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,18 +16,14 @@ public class LogWindowSource {
         listeners = new ArrayList<>();
     }
 
-    public LogWindowListener registerListener(LogChangeListener changeListener) {
-        return new LogWindowListener(changeListener);
-    }
-
-    private void innerRegisterListener(LogChangeListener listener) {
+    public void registerListener(LogChangeListener listener) {
         synchronized (listeners) {
             listeners.add(listener);
             activeListener = null;
         }
     }
 
-    private void unregisterListener(LogChangeListener listener) {
+    public void unregisterListener(LogChangeListener listener) {
         synchronized (listeners) {
             listeners.remove(listener);
             activeListener = null;
@@ -67,19 +63,5 @@ public class LogWindowSource {
 
     public Iterable<LogEntry> all() {
         return messages;
-    }
-
-    public class LogWindowListener implements AutoCloseable {
-        private final LogChangeListener changeListener;
-
-        private LogWindowListener(LogChangeListener changeListener) {
-            this.changeListener = changeListener;
-            innerRegisterListener(this.changeListener);
-        }
-
-        @Override
-        public void close() {
-            unregisterListener(this.changeListener);
-        }
     }
 }
