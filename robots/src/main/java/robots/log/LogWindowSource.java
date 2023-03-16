@@ -3,16 +3,18 @@ package robots.log;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class LogWindowSource {
     private final int queueLength;
-    private List<LogEntry> messages;
+    private final Queue<LogEntry> messages;
     private final List<LogChangeListener> listeners;
     private volatile LogChangeListener[] activeListener;
 
     public LogWindowSource(int iQueueLength) {
         queueLength = iQueueLength;
-        messages = new ArrayList<>(iQueueLength);
+        messages = new ConcurrentLinkedQueue<>();
         listeners = new ArrayList<>();
     }
 
@@ -32,8 +34,11 @@ public class LogWindowSource {
 
     public void append(LogLevel logLevel, String strMessage) {
         LogEntry entry = new LogEntry(logLevel, strMessage);
-        if (messages.size() > queueLength)
-            messages = messages.subList(1, messages.size() - 1);
+
+        if (messages.size() > queueLength) {
+            messages.peek();
+        }
+
         messages.add(entry);
         LogChangeListener[] activeListeners = activeListener;
         if (activeListeners == null) {
@@ -58,7 +63,7 @@ public class LogWindowSource {
             return Collections.emptyList();
         }
         int indexTo = Math.min(startFrom + count, messages.size());
-        return messages.subList(startFrom, indexTo);
+        return messages.stream().toList().subList(startFrom, indexTo);
     }
 
     public Iterable<LogEntry> all() {
