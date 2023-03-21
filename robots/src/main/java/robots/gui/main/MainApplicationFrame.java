@@ -9,7 +9,6 @@ import robots.gui.common.RobotsWindowAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
 import robots.gui.main.menu.JMenuFactory;
-import robots.localisation.Localisation;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
 
@@ -24,15 +23,14 @@ public class MainApplicationFrame extends JFrame {
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
-        Localisation localisation = RobotsLocalisation.getLocalisation();
 
-        addWindow(createLogWindow(localisation.getLogLocalisation()));
+        addWindow(createLogWindow());
 
-        GameWindow gameWindow = new GameWindow(localisation.getGameLocalisation());
+        GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
         addWindow(gameWindow);
 
-        setJMenuBar(generateMenuBar(localisation));
+        setJMenuBar(generateMenuBar());
     }
 
     @Override
@@ -48,13 +46,13 @@ public class MainApplicationFrame extends JFrame {
         }
     }
 
-    protected LogWindow createLogWindow(Localisation.LogLocalisation localisation) {
+    protected LogWindow createLogWindow() {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         logWindow.setLocation(10, 10);
         logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
-        Logger.debug(localisation.getLogProtocolStart());
+        Logger.debug(RobotsLocalisation.getString("log.message.start"));
         return logWindow;
     }
 
@@ -63,9 +61,9 @@ public class MainApplicationFrame extends JFrame {
         frame.setVisible(true);
     }
 
-    private JMenuBar generateMenuBar(Localisation localisation) {
+    private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        JMenuFactory jMenuFactory = new JMenuFactory(localisation, this);
+        JMenuFactory jMenuFactory = new JMenuFactory(this);
         menuBar.add(jMenuFactory.createLookAndFeelMenu());
         menuBar.add(jMenuFactory.createTestMenu());
         menuBar.add(jMenuFactory.createExitMenu());

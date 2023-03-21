@@ -4,6 +4,7 @@ import robots.gui.main.MainApplicationFrame;
 
 import java.awt.Frame;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -11,7 +12,6 @@ import javax.swing.UIManager;
 public class RobotsProgram {
 
     public static void main(String[] args) {
-        Locale.setDefault(Locale.UK);
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {

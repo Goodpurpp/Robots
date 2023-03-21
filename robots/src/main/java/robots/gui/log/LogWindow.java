@@ -9,6 +9,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import robots.gui.common.RobotsInternalFrameAdapter;
+import robots.localisation.RobotsLocalisation;
 import robots.log.LogChangeListener;
 import robots.log.LogEntry;
 import robots.log.LogWindowSource;
@@ -18,7 +19,7 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     private final TextArea logContent;
 
     public LogWindow(LogWindowSource logSource) {
-        super("Протокол работы", true, true, true, true);
+        super(RobotsLocalisation.getString("log.message.start"), true, true, true, true);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addInternalFrameListener(new RobotsInternalFrameAdapter(this));
         this.addInternalFrameListener(new LogWindowAdapter());

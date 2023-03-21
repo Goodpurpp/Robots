@@ -2,23 +2,35 @@ package robots.localisation;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class RobotsLocalisation {
-    private static final Map<Locale, Localisation> localisations;
-    private static final EnLocalisation enLocalisation = new EnLocalisation();
+    private static final ResourceBundle resourceBundle;
 
     static {
-        localisations = Map.of(
-                new Locale("ru", "RU"), new RuLocalisation(),
-                Locale.UK, enLocalisation
-        );
+        ResourceBundle tmp;
+        try {
+            tmp = ResourceBundle.getBundle("Localisation", Locale.getDefault());
+        } catch (MissingResourceException e) {
+            tmp = ResourceBundle.getBundle("Localisation_en_US");
+        }
+        resourceBundle = tmp;
     }
 
     private RobotsLocalisation() {
         throw new IllegalStateException();
     }
 
-    public static Localisation getLocalisation() {
-        return localisations.getOrDefault(Locale.getDefault(), enLocalisation);
+    public static String getString(String key) {
+        return resourceBundle.getString(key);
+    }
+
+    public static Object getObject(String key) {
+        return resourceBundle.getObject(key);
+    }
+
+    public static String[] getStrings(String key) {
+        return resourceBundle.getStringArray(key);
     }
 }

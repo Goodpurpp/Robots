@@ -1,7 +1,7 @@
 package robots.gui.game;
 
 import robots.gui.common.RobotsInternalFrameAdapter;
-import robots.localisation.Localisation;
+import robots.localisation.RobotsLocalisation;
 
 import java.awt.BorderLayout;
 
@@ -10,8 +10,8 @@ import javax.swing.*;
 public class GameWindow extends JInternalFrame {
     private final GameVisualizer visualizer;
 
-    public GameWindow(Localisation.GameLocalisation gameLocalisation) {
-        super(gameLocalisation.getGameField(), true, true, true, true);
+    public GameWindow() {
+        super(RobotsLocalisation.getString("game.field.name"), true, true, true, true);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addInternalFrameListener(new RobotsInternalFrameAdapter(this));
         this.visualizer = new GameVisualizer();

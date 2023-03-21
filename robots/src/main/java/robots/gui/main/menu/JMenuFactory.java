@@ -1,8 +1,7 @@
 package robots.gui.main.menu;
 
 import lombok.RequiredArgsConstructor;
-import robots.localisation.Localisation;
-import robots.localisation.Localisation.MenuItemLocalisation;
+import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
 
 import javax.swing.*;
@@ -13,19 +12,17 @@ import java.awt.event.WindowEvent;
 
 @RequiredArgsConstructor
 public class JMenuFactory {
-    private final Localisation localisation;
     private final Window window;
 
     public JMenu createLookAndFeelMenu() {
-        MenuItemLocalisation itemLocalisation = localisation.getMenuLocalisation().getItemsLocalisation().get(0);
-        JMenu lookAndFeelMenu = new JMenu(itemLocalisation.getMenuName());
+        JMenu lookAndFeelMenu = new JMenu(RobotsLocalisation.getString("menu.view.name"));
         lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(itemLocalisation.getDescription());
-        addJMenuItem(lookAndFeelMenu, itemLocalisation.getItemsName().get(0), KeyEvent.VK_S, (event) -> {
+        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.view.description"));
+        addJMenuItem(lookAndFeelMenu, RobotsLocalisation.getString("menu.view.items.system_schema"), KeyEvent.VK_S, (event) -> {
             setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             window.invalidate();
         });
-        addJMenuItem(lookAndFeelMenu, itemLocalisation.getItemsName().get(0), KeyEvent.VK_S, (event) -> {
+        addJMenuItem(lookAndFeelMenu, RobotsLocalisation.getString("menu.view.items.universal_schema"), KeyEvent.VK_S, (event) -> {
             setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             window.invalidate();
         });
@@ -49,20 +46,18 @@ public class JMenuFactory {
     }
 
     public JMenu createTestMenu() {
-        MenuItemLocalisation itemLocalisation = localisation.getMenuLocalisation().getItemsLocalisation().get(1);
-        JMenu testMenu = new JMenu(itemLocalisation.getMenuName());
+        JMenu testMenu = new JMenu(RobotsLocalisation.getString("menu.test.name"));
         testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(itemLocalisation.getDescription());
-        addJMenuItem(testMenu, itemLocalisation.getItemsName().get(0), KeyEvent.VK_S, (event) -> Logger.debug("Новая строка"));
+        testMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.test.description"));
+        addJMenuItem(testMenu, RobotsLocalisation.getString("menu.test.items.log_message"), KeyEvent.VK_S, (event) -> Logger.debug(RobotsLocalisation.getString("log.message.test")));
         return testMenu;
     }
 
     public JMenu createExitMenu() {
-        MenuItemLocalisation itemLocalisation = localisation.getMenuLocalisation().getItemsLocalisation().get(2);
-        JMenu exitMenu = new JMenu(itemLocalisation.getMenuName());
+        JMenu exitMenu = new JMenu(RobotsLocalisation.getString("menu.exit.name"));
         exitMenu.setMnemonic(KeyEvent.VK_ESCAPE);
-        exitMenu.getAccessibleContext().setAccessibleDescription(itemLocalisation.getDescription());
-        addJMenuItem(exitMenu, itemLocalisation.getItemsName().get(0), KeyEvent.VK_S, (event) -> window.dispatchEvent(createClosingEvent(window)));
+        exitMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.exit.description"));
+        addJMenuItem(exitMenu, RobotsLocalisation.getString("menu.exit.items.exit"), KeyEvent.VK_S, (event) -> window.dispatchEvent(createClosingEvent(window)));
         return exitMenu;
     }
 
