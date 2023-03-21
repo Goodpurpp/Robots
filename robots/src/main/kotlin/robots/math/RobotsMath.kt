@@ -17,3 +17,5 @@ fun angleTo(fromX: Double, fromY: Double, toX: Double, toY: Double) =
 fun asNormalizedRadians(angle: Double) = (angle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI)
 
 fun applyLimits(value: Double, min: Double, max:Double) = max(min, min(value, max))
+
+fun findScalar(first: Double, second: Double) = second / first

@@ -1,7 +1,10 @@
 package robots.gui.common
 
 import robots.gui.utils.GuiUtils
+import java.awt.Component
 import java.awt.Window
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JInternalFrame
