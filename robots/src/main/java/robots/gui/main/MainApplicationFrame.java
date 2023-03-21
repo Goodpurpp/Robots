@@ -8,7 +8,7 @@ import javax.swing.*;
 import robots.gui.common.RobotsWindowAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
-import robots.gui.menu.JMenuFactory;
+import robots.gui.main.menu.JMenuFactory;
 import robots.localisation.Localisation;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;

@@ -1,4 +1,4 @@
-package robots.gui.menu;
+package robots.gui.main.menu;
 
 import lombok.RequiredArgsConstructor;
 import robots.localisation.Localisation;
