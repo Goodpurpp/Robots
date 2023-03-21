@@ -1,4 +1,4 @@
-package robots.logic;
+package robots.gui.game;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -8,6 +8,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JPanel;
+
+import static robots.math.RobotsMathKt.angleTo;
+import static robots.math.RobotsMathKt.applyLimits;
+import static robots.math.RobotsMathKt.asNormalizedRadians;
+import static robots.math.RobotsMathKt.distance;
 
 public class GameVisualizer extends JPanel {
     private final Timer timer = initTimer();
@@ -51,25 +56,12 @@ public class GameVisualizer extends JPanel {
     }
 
     protected void setTargetPosition(Point p) {
-        targetPositionX = p.x * 2;
-        targetPositionY = p.y * 2;
+        targetPositionX = p.x;
+        targetPositionY = p.y;
     }
 
     protected void onRedrawEvent() {
         EventQueue.invokeLater(this::repaint);
-    }
-
-    private static double distance(double x1, double y1, double x2, double y2) {
-        double diffX = x1 - x2;
-        double diffY = y1 - y2;
-        return Math.sqrt(diffX * diffX + diffY * diffY);
-    }
-
-    private static double angleTo(double fromX, double fromY, double toX, double toY) {
-        double diffX = toX - fromX;
-        double diffY = toY - fromY;
-
-        return asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 
     protected void onModelUpdateEvent() {
@@ -79,77 +71,46 @@ public class GameVisualizer extends JPanel {
         }
         double angleToTarget = angleTo(robotPositionX, robotPositionY, targetPositionX, targetPositionY);
         double angularVelocity = 0;
-        double angle = asNormalizedRadians(angleToTarget - robotDirection);
         if (angleToTarget > robotDirection) {
             angularVelocity = maxAngularVelocity;
         } else if (angleToTarget < robotDirection) {
             angularVelocity = -maxAngularVelocity;
         }
 
-        moveRobot(maxVelocity, angularVelocity, 10, angle);
+        moveRobot(maxVelocity, angularVelocity, 10);
     }
 
-    private static double applyLimits(double value, double min, double max) {
-        return Math.max(min, Math.min(value, max));
-    }
-
-    private void moveRobot(double velocity, double angularVelocity, double duration, double angle) {
+    private void moveRobot(double velocity, double angularVelocity, double duration) {
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
         double newX = robotPositionX + velocity / angularVelocity *
-                (Math.sin(robotDirection + Math.min(angle, angularVelocity) * duration) -
+                (Math.sin(robotDirection + angularVelocity * duration) -
                         Math.sin(robotDirection));
         if (!Double.isFinite(newX)) {
             newX = robotPositionX + velocity * duration * Math.cos(robotDirection);
         }
         double newY = robotPositionY - velocity / angularVelocity *
-                (Math.cos(robotDirection + Math.min(angle, angularVelocity) * duration) -
+                (Math.cos(robotDirection + angularVelocity * duration) -
                         Math.cos(robotDirection));
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
-        robotPositionX = this.validateNewPositionX(newX);
-        robotPositionY = this.validateNewPositionY(newY);
-        double newDirection = asNormalizedRadians(robotDirection + Math.min(angle, angularVelocity) * duration);
+        Dimension dimension = this.getSize();
+        robotPositionX = applyLimits(newX, 0, dimension.width);
+        robotPositionY = applyLimits(newY, 0, dimension.height);
+        double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration + bounceAngle(newX, newY));
         robotDirection = newDirection;
     }
 
-    private double validateNewPositionX(double newRobotPositionX) {
-        Dimension dimension = this.getSize();
-        return Math.max(0, Math.min(dimension.width * 2, newRobotPositionX));
+    private double bounceAngle(double robotNewX, double robotNewY) {
+        if (Double.compare(robotNewX, robotPositionX) != 0) {
+            return robotDirection - Math.PI;
+        } else if (Double.compare(robotNewY, robotPositionY) != 0) {
+            return robotDirection - Math.PI / 2;
+        }
+        return 0;
     }
 
-    private double validateNewPositionY(double newRobotPositionY) {
-        Dimension dimension = this.getSize();
-        return Math.max(0, Math.min(dimension.height * 2, newRobotPositionY));
-    }
-
-    private double validateAngularVelocity(double angularVelocity, double robotNewX, double robotNewY) {
-        double deltaX = robotNewX - robotPositionX;
-        double deltaY = robotNewY - robotPositionY;
-        double XtoY = deltaX / deltaY;
-        if (!Double.isFinite(XtoY)) {
-            XtoY = 0;
-        }
-        double YtoX = deltaY / deltaX;
-        if (!Double.isFinite(YtoX)) {
-            YtoX = 0;
-        }
-
-        double angularXVelocity = robotPositionX / robotNewX - 1;
-        double angularYVelocity = robotPositionY / robotNewY - 1;
-        return angularVelocity + Math.signum(angularXVelocity) * Math.abs(XtoY) + Math.signum(angularYVelocity) * Math.abs(YtoX);
-    }
-
-    private static double asNormalizedRadians(double angle) {
-        while (angle < 0) {
-            angle += 2 * Math.PI;
-        }
-        while (angle >= 2 * Math.PI) {
-            angle -= 2 * Math.PI;
-        }
-        return angle;
-    }
 
     private static int round(double value) {
         return (int) (value + 0.5);

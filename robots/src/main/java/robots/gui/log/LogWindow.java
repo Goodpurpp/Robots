@@ -1,4 +1,4 @@
-package robots.gui;
+package robots.gui.log;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import robots.gui.common.RobotsInternalFrameAdapter;
 import robots.log.LogChangeListener;
 import robots.log.LogEntry;
 import robots.log.LogWindowSource;
@@ -19,6 +20,7 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     public LogWindow(LogWindowSource logSource) {
         super("Протокол работы", true, true, true, true);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addInternalFrameListener(new RobotsInternalFrameAdapter(this));
         this.addInternalFrameListener(new LogWindowAdapter());
         this.logSource = logSource;
         logSource.registerListener(this);
@@ -47,21 +49,6 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     }
 
     private final class LogWindowAdapter extends InternalFrameAdapter {
-        @Override
-        public void internalFrameClosing(InternalFrameEvent event) {
-            int answer = GuiUtils.askUserForCloseComponentAndWaitAnswer(LogWindow.this);
-
-            switch (answer) {
-                case JOptionPane.YES_OPTION -> {
-                    LogWindow.this.setVisible(false);
-                    LogWindow.this.dispose();
-                }
-                case JOptionPane.NO_OPTION -> {
-
-                }
-            }
-        }
-
         @Override
         public void internalFrameClosed(InternalFrameEvent event) {
             LogWindow.this.logSource.unregisterListener(LogWindow.this);

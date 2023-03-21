@@ -8,6 +8,7 @@ public final class Logger {
     }
 
     private Logger() {
+        throw new IllegalStateException();
     }
 
     public static void debug(String strMessage) {
