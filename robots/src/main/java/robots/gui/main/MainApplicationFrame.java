@@ -7,16 +7,12 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
-import robots.common.Pair;
 import robots.gui.common.RobotsWindowAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
 import robots.localisation.Localisation;
-import robots.localisation.Localisation.MenuItemLocalisation;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
-
-import java.util.List;
 
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
@@ -70,30 +66,28 @@ public class MainApplicationFrame extends JFrame {
 
     private JMenuBar generateMenuBar(Localisation.MenuLocalisation menuLocalisation) {
         JMenuBar menuBar = new JMenuBar();
-        JMenuFactory menuFactory = new JMenuFactory();
-        MenuItemLocalisation menuItemLocalisation = menuLocalisation.getItemsLocalisation().get(0);
-        JMenu lookAndFeelMenu = menuFactory.createJMenu(
-                menuItemLocalisation.getMenuName(),
-                KeyEvent.VK_V,
-                menuItemLocalisation.getDescription(),
-                List.of(new Pair<>(menuItemLocalisation.getItemsName().get(0), (event) -> {
-                            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                            this.invalidate();
-                        }),
-                        new Pair<>(menuItemLocalisation.getItemsName().get(1), (event) -> {
-                            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                            this.invalidate();
-                        })
-                )
-        );
-        menuItemLocalisation = menuLocalisation.getItemsLocalisation().get(1);
+        JMenu lookAndFeelMenu = createLookAndFeelMenu(menuLocalisation.getItemsLocalisation().get(0));
         JMenu testMenu = createTestMenu(menuLocalisation.getItemsLocalisation().get(1));
-        menuItemLocalisation = menuLocalisation.getItemsLocalisation().get(1);
         JMenuItem exitMenu = createExitMenu(menuLocalisation.getItemsLocalisation().get(2));
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
         menuBar.add(exitMenu);
         return menuBar;
+    }
+
+    private JMenu createLookAndFeelMenu(Localisation.MenuItemLocalisation itemLocalisation) {
+        JMenu lookAndFeelMenu = new JMenu(itemLocalisation.getMenuName());
+        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
+        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(itemLocalisation.getDescription());
+        addJMenuItem(lookAndFeelMenu, itemLocalisation.getItemsName().get(0), KeyEvent.VK_S, (event) -> {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        });
+        addJMenuItem(lookAndFeelMenu, itemLocalisation.getItemsName().get(0), KeyEvent.VK_S, (event) -> {
+            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            this.invalidate();
+        });
+        return lookAndFeelMenu;
     }
 
     private JMenu createTestMenu(Localisation.MenuItemLocalisation itemLocalisation) {
