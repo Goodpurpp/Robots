@@ -9,20 +9,25 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import robots.gui.common.RobotsInternalFrameAdapter;
+import robots.gui.common.RobotsJInternalFrame;
+import robots.gui.common.RobotsJInternalFrameState;
+import robots.gui.common.PathEnum;
+import robots.gui.common.RobotsLocaleChangedAdapter;
 import robots.localisation.RobotsLocalisation;
 import robots.log.LogChangeListener;
 import robots.log.LogEntry;
 import robots.log.LogWindowSource;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener {
+public class LogWindow extends RobotsJInternalFrame implements LogChangeListener {
     private final LogWindowSource logSource;
     private final TextArea logContent;
 
     public LogWindow(LogWindowSource logSource) {
         super(RobotsLocalisation.getString("log.message.start"), true, true, true, true);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addInternalFrameListener(new RobotsInternalFrameAdapter(this));
+        this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, PathEnum.LOG_WINDOW_JSON_PATH.getPath()));
         this.addInternalFrameListener(new LogWindowAdapter());
+        this.addPropertyChangeListener(new RobotsLocaleChangedAdapter(this));
         this.logSource = logSource;
         logSource.registerListener(this);
         logContent = new TextArea("");
@@ -47,6 +52,26 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public RobotsJInternalFrameState writeWindowState() {
+        return new RobotsJInternalFrameState(this.getSize(), this.isMaximum, this.isIcon);
+    }
+
+    @Override
+    public void readWindowState(RobotsJInternalFrameState state) {
+        if (state == null) {
+            this.setLocation(10, 10);
+            this.setSize(300, 800);
+            this.pack();
+            return;
+        }
+
+        this.setSize(state.getDimension());
+        this.isIcon = state.isIcon();
+        this.isMaximum = state.isMaximized();
+        this.pack();
     }
 
     private final class LogWindowAdapter extends InternalFrameAdapter {

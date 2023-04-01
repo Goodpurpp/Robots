@@ -1,12 +1,12 @@
 package robots.localisation;
 
+import javax.swing.*;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class RobotsLocalisation {
-    private static final ResourceBundle resourceBundle;
+    private static ResourceBundle resourceBundle;
 
     static {
         ResourceBundle tmp;
@@ -20,6 +20,14 @@ public class RobotsLocalisation {
 
     private RobotsLocalisation() {
         throw new IllegalStateException();
+    }
+
+    public static void changeLocalisation(LocalisationEnum localisation) {
+        resourceBundle = ResourceBundle.getBundle("Localisation", localisation.getLocale());
+    }
+
+    public static LocalisationEnum getLocale() {
+        return LocalisationEnum.valueOf(resourceBundle.getLocale());
     }
 
     public static String getString(String key) {

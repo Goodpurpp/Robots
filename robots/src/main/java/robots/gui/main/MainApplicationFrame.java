@@ -2,23 +2,32 @@ package robots.gui.main;
 
 import java.awt.*;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyVetoException;
 
 import javax.swing.*;
 
+import lombok.Getter;
+import robots.gui.common.Pair;
+import robots.gui.common.RobotsJFrame;
+import robots.gui.common.RobotsJFrameState;
+import robots.gui.common.RobotsLocaleChangedAdapter;
 import robots.gui.common.RobotsWindowAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
 import robots.gui.main.menu.JMenuFactory;
+import robots.gui.common.PathEnum;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
 
-public class MainApplicationFrame extends JFrame {
+public class MainApplicationFrame extends RobotsJFrame {
+    @Getter
     private final JDesktopPane desktopPane = new JDesktopPane();
 
     public MainApplicationFrame() {
         this.setContentPane(desktopPane);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new RobotsWindowAdapter(this));
+        this.addWindowListener(new RobotsWindowAdapter(this, PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath()));
+        this.addPropertyChangeListener(new RobotsLocaleChangedAdapter(this));
 
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -27,7 +36,6 @@ public class MainApplicationFrame extends JFrame {
         addWindow(createLogWindow());
 
         GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400, 400);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
@@ -39,8 +47,12 @@ public class MainApplicationFrame extends JFrame {
         if (windowEvent.getID() == WindowEvent.WINDOW_CLOSED) {
             JInternalFrame[] frames = desktopPane.getAllFrames();
             for (JInternalFrame frame : frames) {
-                frame.setVisible(false);
-                frame.dispose();
+                try {
+                    frame.setClosed(true);
+                } catch (PropertyVetoException e) {
+                    frame.setVisible(false);
+                    frame.dispose();
+                }
             }
             System.exit(0);
         }
@@ -48,10 +60,7 @@ public class MainApplicationFrame extends JFrame {
 
     protected LogWindow createLogWindow() {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10, 10);
-        logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
-        logWindow.pack();
         Logger.debug(RobotsLocalisation.getString("log.message.start"));
         return logWindow;
     }
@@ -67,6 +76,22 @@ public class MainApplicationFrame extends JFrame {
         menuBar.add(jMenuFactory.createLookAndFeelMenu());
         menuBar.add(jMenuFactory.createTestMenu());
         menuBar.add(jMenuFactory.createExitMenu());
+        menuBar.add(jMenuFactory.createLocalisationMenu());
         return menuBar;
+    }
+
+    @Override
+    public RobotsJFrameState writeWindowState() {
+        return new RobotsJFrameState(this.getSize(), new Pair<>(this.getX(), this.getY()));
+    }
+
+    @Override
+    public void readWindowState(RobotsJFrameState state) {
+        if (state == null) {
+            return;
+        }
+
+        this.setSize(state.getDimension());
+        this.setLocation(state.getLocation().first(), state.getLocation().second());
     }
 }

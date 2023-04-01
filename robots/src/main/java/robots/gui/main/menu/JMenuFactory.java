@@ -1,6 +1,8 @@
 package robots.gui.main.menu;
 
 import lombok.RequiredArgsConstructor;
+import robots.localisation.LocalisationChangeEvent;
+import robots.localisation.LocalisationEnum;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
 
@@ -18,18 +20,20 @@ public class JMenuFactory {
         JMenu lookAndFeelMenu = new JMenu(RobotsLocalisation.getString("menu.view.name"));
         lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
         lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.view.description"));
-        addJMenuItem(lookAndFeelMenu, RobotsLocalisation.getString("menu.view.items.system_schema"), KeyEvent.VK_S, (event) -> {
+        addJMenuItem(lookAndFeelMenu, RobotsLocalisation.getString("menu.view.items.system_schema"),
+                KeyEvent.VK_S, (event) -> {
             setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             window.invalidate();
         });
-        addJMenuItem(lookAndFeelMenu, RobotsLocalisation.getString("menu.view.items.universal_schema"), KeyEvent.VK_S, (event) -> {
+        addJMenuItem(lookAndFeelMenu, RobotsLocalisation.getString("menu.view.items.universal_schema"),
+                KeyEvent.VK_S, (event) -> {
             setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             window.invalidate();
         });
         return lookAndFeelMenu;
     }
 
-    private void addJMenuItem(JMenu menu, String itemText, int itemKeyEventCode, ActionListener actionListener) {
+    private static void addJMenuItem(JMenu menu, String itemText, int itemKeyEventCode, ActionListener actionListener) {
         JMenuItem menuItem = new JMenuItem(itemText, itemKeyEventCode);
         menuItem.addActionListener(actionListener);
         menu.add(menuItem);
@@ -49,7 +53,8 @@ public class JMenuFactory {
         JMenu testMenu = new JMenu(RobotsLocalisation.getString("menu.test.name"));
         testMenu.setMnemonic(KeyEvent.VK_T);
         testMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.test.description"));
-        addJMenuItem(testMenu, RobotsLocalisation.getString("menu.test.items.log_message"), KeyEvent.VK_S, (event) -> Logger.debug(RobotsLocalisation.getString("log.message.test")));
+        addJMenuItem(testMenu, RobotsLocalisation.getString("menu.test.items.log_message"),
+                KeyEvent.VK_S, (event) -> Logger.debug(RobotsLocalisation.getString("log.message.test")));
         return testMenu;
     }
 
@@ -57,12 +62,26 @@ public class JMenuFactory {
         JMenu exitMenu = new JMenu(RobotsLocalisation.getString("menu.exit.name"));
         exitMenu.setMnemonic(KeyEvent.VK_ESCAPE);
         exitMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.exit.description"));
-        addJMenuItem(exitMenu, RobotsLocalisation.getString("menu.exit.items.exit"), KeyEvent.VK_S, (event) -> window.dispatchEvent(createClosingEvent(window)));
+        addJMenuItem(exitMenu, RobotsLocalisation.getString("menu.exit.items.exit"),
+                KeyEvent.VK_S, (event) -> window.dispatchEvent(createClosingEvent(window)));
         return exitMenu;
     }
 
-    private WindowEvent createClosingEvent(Window window) {
+    private static WindowEvent createClosingEvent(Window window) {
         return new WindowEvent(window, WindowEvent.WINDOW_CLOSING);
     }
 
+    public JMenu createLocalisationMenu() {
+        JMenu localisationMenu = new JMenu(RobotsLocalisation.getString("menu.local.name"));
+        localisationMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.local.description"));
+        addJMenuItem(localisationMenu, RobotsLocalisation.getString("menu.local.items.ru"),
+                KeyEvent.VK_S, (event) -> window.dispatchEvent(createChangeLocalisation(window, LocalisationEnum.RU)));
+        addJMenuItem(localisationMenu, RobotsLocalisation.getString("menu.local.items.en"),
+                KeyEvent.VK_S, (event) -> window.dispatchEvent(createChangeLocalisation(window, LocalisationEnum.EN)));
+        return localisationMenu;
+    }
+
+    private static LocalisationChangeEvent createChangeLocalisation(Window window, LocalisationEnum newLocale) {
+        return new LocalisationChangeEvent(window, "localisation", RobotsLocalisation.getLocale(), newLocale);
+    }
 }

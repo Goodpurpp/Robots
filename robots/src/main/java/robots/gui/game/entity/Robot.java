@@ -12,6 +12,9 @@ import static robots.math.RobotsMathKt.distance;
 
 @RequiredArgsConstructor
 public class Robot {
+    private static final double maxVelocity = 0.1;
+    private static final double maxAngularVelocity = 0.001;
+
     @Getter
     private volatile double robotPositionX = 100;
     @Getter
@@ -19,8 +22,6 @@ public class Robot {
     @Getter
     private volatile double robotDirection = 0;
 
-    private static final double maxVelocity = 0.1;
-    private static final double maxAngularVelocity = 0.001;
 
     public void onModelUpdateEvent(Target target, Dimension dimension) {
         double targetX = target.getTargetPositionX();
