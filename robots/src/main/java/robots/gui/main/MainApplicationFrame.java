@@ -10,7 +10,7 @@ import lombok.Getter;
 import robots.gui.common.Pair;
 import robots.gui.common.RobotsJFrame;
 import robots.gui.common.RobotsJFrameState;
-import robots.gui.common.RobotsLocaleChangedAdapter;
+import robots.gui.common.RobotsLocaleChangeAdapter;
 import robots.gui.common.RobotsWindowAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
@@ -27,18 +27,18 @@ public class MainApplicationFrame extends RobotsJFrame {
         this.setContentPane(desktopPane);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new RobotsWindowAdapter(this, PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath()));
-        this.addPropertyChangeListener(new RobotsLocaleChangedAdapter(this));
+        this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
 
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
 
-        addWindow(createLogWindow());
+        this.addWindow(createLogWindow());
 
         GameWindow gameWindow = new GameWindow();
-        addWindow(gameWindow);
+        this.addWindow(gameWindow);
 
-        setJMenuBar(generateMenuBar());
+        this.setJMenuBar(generateMenuBar());
     }
 
     @Override
@@ -70,6 +70,11 @@ public class MainApplicationFrame extends RobotsJFrame {
         frame.setVisible(true);
     }
 
+    protected void removeWindow(JInternalFrame frame) {
+        desktopPane.remove(frame);
+        frame.setVisible(false);
+    }
+
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenuFactory jMenuFactory = new JMenuFactory(this);
@@ -93,5 +98,10 @@ public class MainApplicationFrame extends RobotsJFrame {
 
         this.setSize(state.getDimension());
         this.setLocation(state.getLocation().first(), state.getLocation().second());
+    }
+
+    @Override
+    public void changeLocalisation() {
+        this.setJMenuBar(generateMenuBar());
     }
 }

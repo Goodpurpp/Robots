@@ -4,7 +4,7 @@ import robots.gui.common.RobotsInternalFrameAdapter;
 import robots.gui.common.RobotsJInternalFrame;
 import robots.gui.common.RobotsJInternalFrameState;
 import robots.gui.common.PathEnum;
-import robots.gui.common.RobotsLocaleChangedAdapter;
+import robots.gui.common.RobotsLocaleChangeAdapter;
 import robots.localisation.RobotsLocalisation;
 
 import java.awt.BorderLayout;
@@ -18,7 +18,7 @@ public class GameWindow extends RobotsJInternalFrame {
         super(RobotsLocalisation.getString("game.field.name"), true, true, true, true);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, PathEnum.GAME_WINDOW_JSON_PATH.getPath()));
-        this.addPropertyChangeListener(new RobotsLocaleChangedAdapter(this));
+        this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
         this.visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(visualizer, BorderLayout.CENTER);
@@ -41,5 +41,10 @@ public class GameWindow extends RobotsJInternalFrame {
         this.setSize(state.getDimension());
         this.isIcon = state.isIcon();
         this.isMaximum = state.isMaximized();
+    }
+
+    @Override
+    public void changeLocalisation() {
+        this.setTitle(RobotsLocalisation.getString("game.field.name"));
     }
 }

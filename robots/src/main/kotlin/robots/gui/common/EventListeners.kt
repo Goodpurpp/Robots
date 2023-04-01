@@ -1,7 +1,9 @@
 package robots.gui.common
 
-import robots.localisation.LocalisationChangeEvent
+import robots.localisation.LocalisationChangeable
+import robots.localisation.LocalisationEnum
 import robots.localisation.RobotsLocalisation
+import robots.log.Logger
 import java.awt.Component
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -82,18 +84,16 @@ class RobotsInternalFrameAdapter(
     }
 }
 
-class RobotsLocaleChangedAdapter(
-    private val component: Component
+class RobotsLocaleChangeAdapter(
+    private val component: LocalisationChangeable
 ): PropertyChangeListener {
     override fun propertyChange(evt: PropertyChangeEvent?) {
-        when (evt) {
-            is LocalisationChangeEvent -> {
-                RobotsLocalisation.changeLocalisation(evt.newValue)
-            }
-            else -> {}
+        evt?.let {
+            Logger.debug("Change locale to" + it.newValue)
+            RobotsLocalisation.changeLocalisation(LocalisationEnum.valueOf(it.newValue as Long))
+            component.changeLocalisation()
         }
     }
-
 }
 
 private fun askUserForLoadState(component: Component?): Int =

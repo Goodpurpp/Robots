@@ -12,7 +12,7 @@ import robots.gui.common.RobotsInternalFrameAdapter;
 import robots.gui.common.RobotsJInternalFrame;
 import robots.gui.common.RobotsJInternalFrameState;
 import robots.gui.common.PathEnum;
-import robots.gui.common.RobotsLocaleChangedAdapter;
+import robots.gui.common.RobotsLocaleChangeAdapter;
 import robots.localisation.RobotsLocalisation;
 import robots.log.LogChangeListener;
 import robots.log.LogEntry;
@@ -27,7 +27,7 @@ public class LogWindow extends RobotsJInternalFrame implements LogChangeListener
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, PathEnum.LOG_WINDOW_JSON_PATH.getPath()));
         this.addInternalFrameListener(new LogWindowAdapter());
-        this.addPropertyChangeListener(new RobotsLocaleChangedAdapter(this));
+        this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
         this.logSource = logSource;
         logSource.registerListener(this);
         logContent = new TextArea("");
@@ -72,6 +72,11 @@ public class LogWindow extends RobotsJInternalFrame implements LogChangeListener
         this.isIcon = state.isIcon();
         this.isMaximum = state.isMaximized();
         this.pack();
+    }
+
+    @Override
+    public void changeLocalisation() {
+        this.setTitle(RobotsLocalisation.getString("log.message.start"));
     }
 
     private final class LogWindowAdapter extends InternalFrameAdapter {

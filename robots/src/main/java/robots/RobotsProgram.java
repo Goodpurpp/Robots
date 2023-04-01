@@ -6,17 +6,11 @@ import robots.localisation.RobotsLocalisation;
 
 import java.awt.Frame;
 import java.io.File;
-import java.util.Locale;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 public class RobotsProgram {
-
-    static {
-        Locale.setDefault(Locale.UK);
-    }
-
     public static void main(String[] args) {
         preInit();
         try {

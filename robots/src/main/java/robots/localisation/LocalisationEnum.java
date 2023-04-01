@@ -25,4 +25,14 @@ public enum LocalisationEnum {
         Logger.error("Не найдено локализации по локали");
         throw new IllegalStateException();
     }
+
+    public static LocalisationEnum valueOf(Long ordinal) {
+        for (LocalisationEnum e : LocalisationEnum.values()) {
+            if (e.ordinal() == ordinal) {
+                return e;
+            }
+        }
+        Logger.error("Не найдено локализации по локали");
+        throw new IllegalStateException();
+    }
 }

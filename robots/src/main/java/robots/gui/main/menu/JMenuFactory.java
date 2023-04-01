@@ -1,7 +1,7 @@
 package robots.gui.main.menu;
 
 import lombok.RequiredArgsConstructor;
-import robots.localisation.LocalisationChangeEvent;
+import robots.gui.main.MainApplicationFrame;
 import robots.localisation.LocalisationEnum;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
@@ -14,7 +14,7 @@ import java.awt.event.WindowEvent;
 
 @RequiredArgsConstructor
 public class JMenuFactory {
-    private final Window window;
+    private final MainApplicationFrame window;
 
     public JMenu createLookAndFeelMenu() {
         JMenu lookAndFeelMenu = new JMenu(RobotsLocalisation.getString("menu.view.name"));
@@ -75,13 +75,21 @@ public class JMenuFactory {
         JMenu localisationMenu = new JMenu(RobotsLocalisation.getString("menu.local.name"));
         localisationMenu.getAccessibleContext().setAccessibleDescription(RobotsLocalisation.getString("menu.local.description"));
         addJMenuItem(localisationMenu, RobotsLocalisation.getString("menu.local.items.ru"),
-                KeyEvent.VK_S, (event) -> window.dispatchEvent(createChangeLocalisation(window, LocalisationEnum.RU)));
+                KeyEvent.VK_S, (event) -> this.changeLocalisation(
+                        "localisation", LocalisationEnum.EN.ordinal(), LocalisationEnum.RU.ordinal()
+                ));
         addJMenuItem(localisationMenu, RobotsLocalisation.getString("menu.local.items.en"),
-                KeyEvent.VK_S, (event) -> window.dispatchEvent(createChangeLocalisation(window, LocalisationEnum.EN)));
+                KeyEvent.VK_S, (event) -> this.changeLocalisation(
+                        "localisation", LocalisationEnum.RU.ordinal(), LocalisationEnum.EN.ordinal()
+                ));
         return localisationMenu;
     }
 
-    private static LocalisationChangeEvent createChangeLocalisation(Window window, LocalisationEnum newLocale) {
-        return new LocalisationChangeEvent(window, "localisation", RobotsLocalisation.getLocale(), newLocale);
+    private void changeLocalisation(String propertyKey, long oldLocalisation, long newLocalisation) {
+        this.window.firePropertyChange(propertyKey, oldLocalisation, newLocalisation);
+        JInternalFrame[] frames = this.window.getDesktopPane().getAllFrames();
+        for (JInternalFrame frame : frames) {
+            frame.firePropertyChange(propertyKey, oldLocalisation, newLocalisation);
+        }
     }
 }

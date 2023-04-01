@@ -1,9 +1,12 @@
 package robots.gui.common;
 
+import robots.localisation.LocalisationChangeable;
+
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class RobotsJFrame extends JFrame implements RobotsSerializable<RobotsJFrameState> {
+public abstract class RobotsJFrame extends JFrame
+        implements RobotsSerializable<RobotsJFrameState>, LocalisationChangeable {
     public RobotsJFrame() throws HeadlessException {
     }
 

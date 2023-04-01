@@ -1,8 +1,11 @@
 package robots.gui.common;
 
+import robots.localisation.LocalisationChangeable;
+
 import javax.swing.*;
 
-public abstract class RobotsJInternalFrame extends JInternalFrame implements RobotsSerializable<RobotsJInternalFrameState> {
+public abstract class RobotsJInternalFrame extends JInternalFrame
+        implements RobotsSerializable<RobotsJInternalFrameState>, LocalisationChangeable {
     public RobotsJInternalFrame() {
     }
 
