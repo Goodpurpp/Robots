@@ -1,5 +1,6 @@
 package robots.gui.common
 
+import robots.localisation.LocalisationEnum
 import java.awt.Dimension
 
 data class RobotsJInternalFrameState(
@@ -11,4 +12,8 @@ data class RobotsJInternalFrameState(
 data class RobotsJFrameState(
     val dimension: Dimension,
     val location: Pair<Int, Int>
+)
+
+data class Localisation(
+    val localisation: LocalisationEnum
 )

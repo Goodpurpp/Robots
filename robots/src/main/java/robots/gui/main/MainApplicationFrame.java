@@ -1,6 +1,5 @@
 package robots.gui.main;
 
-import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 
@@ -29,10 +28,6 @@ public class MainApplicationFrame extends RobotsJFrame {
         this.addWindowListener(new RobotsWindowAdapter(this, PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath()));
         this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
 
-        int inset = 50;
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
-
         this.addWindow(createLogWindow());
 
         GameWindow gameWindow = new GameWindow();
@@ -54,6 +49,7 @@ public class MainApplicationFrame extends RobotsJFrame {
                     frame.dispose();
                 }
             }
+            RobotsLocalisation.save();
             System.exit(0);
         }
     }

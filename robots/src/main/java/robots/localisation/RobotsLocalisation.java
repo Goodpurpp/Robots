@@ -1,5 +1,9 @@
 package robots.localisation;
 
+import robots.gui.common.GsonHelper;
+import robots.gui.common.Localisation;
+import robots.gui.common.PathEnum;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -22,6 +26,10 @@ public class RobotsLocalisation {
     }
 
     public static void changeLocalisation(LocalisationEnum localisation) {
+        if (localisation == null) {
+            return;
+        }
+
         resourceBundle = ResourceBundle.getBundle("Localisation", localisation.getLocale());
     }
 
@@ -39,5 +47,10 @@ public class RobotsLocalisation {
 
     public static String[] getStrings(String key) {
         return resourceBundle.getStringArray(key);
+    }
+
+    public static void save() {
+        GsonHelper<Localisation> gsonHelper = new GsonHelper<>();
+        gsonHelper.loadToJson(PathEnum.LOCALISATION_JSON_PATH.getPath(), new Localisation(getLocale()));
     }
 }

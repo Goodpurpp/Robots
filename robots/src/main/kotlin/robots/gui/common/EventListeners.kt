@@ -3,7 +3,6 @@ package robots.gui.common
 import robots.localisation.LocalisationChangeable
 import robots.localisation.LocalisationEnum
 import robots.localisation.RobotsLocalisation
-import robots.log.Logger
 import java.awt.Component
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -19,17 +18,20 @@ class RobotsWindowAdapter(
     private val jsonPath: Path
 ) : WindowAdapter() {
     override fun windowOpened(e: WindowEvent?) {
-        window.readWindowState(
-            when (askUserForLoadState(window)) {
-                JOptionPane.YES_OPTION -> {
-                    val gsonHelper = GsonHelper<RobotsJFrameState>()
-                    gsonHelper.loadFromJson(jsonPath, RobotsJFrameState::class.java)
+        val gsonHelper = GsonHelper<RobotsJFrameState>()
+        gsonHelper.loadFromJson(jsonPath, RobotsJFrameState::class.java)?.let {
+            window.readWindowState(
+                when (askUserForLoadState(window)) {
+                    JOptionPane.YES_OPTION -> {
+                        it
+                    }
+
+                    else -> {
+                        null
+                    }
                 }
-                else -> {
-                    null
-                }
-            }
-        )
+            )
+        }
     }
 
     override fun windowClosing(event: WindowEvent) {
@@ -54,17 +56,20 @@ class RobotsInternalFrameAdapter(
     private val jsonPath: Path
 ) : InternalFrameAdapter() {
     override fun internalFrameOpened(e: InternalFrameEvent?) {
-        internalFrame.readWindowState(
-            when (askUserForLoadState(internalFrame)) {
-                JOptionPane.YES_OPTION -> {
-                    val gsonHelper = GsonHelper<RobotsJInternalFrameState>()
-                    gsonHelper.loadFromJson(jsonPath, RobotsJInternalFrameState::class.java)
+        val gsonHelper = GsonHelper<RobotsJInternalFrameState>()
+        gsonHelper.loadFromJson(jsonPath, RobotsJInternalFrameState::class.java)?.let {
+            internalFrame.readWindowState(
+                when (askUserForLoadState(internalFrame)) {
+                    JOptionPane.YES_OPTION -> {
+                        it
+                    }
+
+                    else -> {
+                        null
+                    }
                 }
-                else -> {
-                    null
-                }
-            }
-        )
+            )
+        }
     }
 
     override fun internalFrameClosing(event: InternalFrameEvent?) {
@@ -86,10 +91,9 @@ class RobotsInternalFrameAdapter(
 
 class RobotsLocaleChangeAdapter(
     private val component: LocalisationChangeable
-): PropertyChangeListener {
+) : PropertyChangeListener {
     override fun propertyChange(evt: PropertyChangeEvent?) {
         evt?.let {
-            Logger.debug("Change locale to" + it.newValue)
             RobotsLocalisation.changeLocalisation(LocalisationEnum.valueOf(it.newValue as Long))
             component.changeLocalisation()
         }

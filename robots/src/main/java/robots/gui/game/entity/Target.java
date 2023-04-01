@@ -12,8 +12,8 @@ public class Target {
     private volatile int targetPositionY;
 
     public void setTargetPosition(Point p) {
-        targetPositionX = p.x;
-        targetPositionY = p.y;
+        targetPositionX = p.x * 2;
+        targetPositionY = p.y * 2;
     }
 
     public void scale(double xScalar, double yScalar) {
