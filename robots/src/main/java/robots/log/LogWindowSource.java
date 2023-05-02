@@ -10,6 +10,7 @@ public class LogWindowSource {
     private final int queueLength;
     private final Queue<LogEntry> messages;
     private final List<LogChangeListener> listeners;
+    private volatile int currentLength = 0;
     private volatile LogChangeListener[] activeListener;
 
     public LogWindowSource(int iQueueLength) {
@@ -36,10 +37,11 @@ public class LogWindowSource {
         LogEntry entry = new LogEntry(logLevel, strMessage);
 
         synchronized (messages) {
-            if (messages.size() > queueLength) {
-                messages.peek();
+            if (currentLength > queueLength) {
+                messages.poll();
             }
             messages.add(entry);
+            currentLength++;
         }
         LogChangeListener[] activeListeners = activeListener;
         if (activeListeners == null) {
