@@ -10,7 +10,6 @@ import robots.gui.common.Pair;
 import robots.gui.common.RobotsJFrame;
 import robots.gui.common.RobotsJFrameState;
 import robots.gui.common.RobotsLocaleChangeAdapter;
-import robots.gui.common.RobotsWindowAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
 import robots.gui.main.menu.JMenuFactory;
@@ -23,9 +22,9 @@ public class MainApplicationFrame extends RobotsJFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
 
     public MainApplicationFrame() {
+        super(PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath());
         this.setContentPane(desktopPane);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new RobotsWindowAdapter(this, PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath()));
         this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
 
         this.addWindow(createLogWindow());

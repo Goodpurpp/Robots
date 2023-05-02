@@ -15,9 +15,8 @@ public class GameWindow extends RobotsJInternalFrame {
     private final GameVisualizer visualizer;
 
     public GameWindow() {
-        super(RobotsLocalisation.getString("game.field.name"), true, true, true, true);
+        super(RobotsLocalisation.getString("game.field.name"), true, true, true, true, PathEnum.GAME_WINDOW_JSON_PATH.getPath());
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, PathEnum.GAME_WINDOW_JSON_PATH.getPath()));
         this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
         this.visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());

@@ -23,9 +23,8 @@ public class LogWindow extends RobotsJInternalFrame implements LogChangeListener
     private final TextArea logContent;
 
     public LogWindow(LogWindowSource logSource) {
-        super(RobotsLocalisation.getString("log.message.start"), true, true, true, true);
+        super(RobotsLocalisation.getString("log.message.start"), true, true, true, true,PathEnum.LOG_WINDOW_JSON_PATH.getPath());
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, PathEnum.LOG_WINDOW_JSON_PATH.getPath()));
         this.addInternalFrameListener(new LogWindowAdapter());
         this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
         this.logSource = logSource;
