@@ -12,4 +12,21 @@ public abstract class RobotsJInternalFrame extends JInternalFrame
         super(title, resizable, closable, maximizable, iconifiable);
         this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, serializedPath));
     }
+
+    @Override
+    public RobotsJInternalFrameState writeWindowState() {
+        return new RobotsJInternalFrameState(this.getSize(), this.isMaximum, this.isIcon);
+    }
+
+    @Override
+    public void readWindowState(RobotsJInternalFrameState state) {
+        if (state == null) {
+            this.setSize(400, 400);
+            return;
+        }
+
+        this.setSize(state.getDimension());
+        this.isIcon = state.isIcon();
+        this.isMaximum = state.isMaximized();
+    }
 }

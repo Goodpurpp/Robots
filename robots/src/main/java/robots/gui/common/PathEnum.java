@@ -9,7 +9,8 @@ public enum PathEnum {
     MAIN_APPLICATION_FRAME_JSON(Path.of(BASE_JSON_PATH.path.toString(), "main-application-frame.json")),
     LOG_WINDOW_JSON_PATH(Path.of(BASE_JSON_PATH.path.toString(), "log-window.json")),
     GAME_WINDOW_JSON_PATH(Path.of(BASE_JSON_PATH.path.toString(), "game-window.json")),
-    LOCALISATION_JSON_PATH(Path.of(BASE_JSON_PATH.path.toString(), "localisation.json"));
+    LOCALISATION_JSON_PATH(Path.of(BASE_JSON_PATH.path.toString(), "localisation.json")),
+    INPUT_JSON_PATH(Path.of(BASE_JSON_PATH.path.toString(), "input.json"));
 
     @Getter
     private final Path path;

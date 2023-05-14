@@ -26,11 +26,16 @@ public class Robot {
     public void onModelUpdateEvent(Target target, Dimension dimension) {
         double targetX = target.getTargetPositionX();
         double targetY = target.getTargetPositionY();
-        double distance = distance(targetX, targetY, robotPositionX, robotPositionY);
+
+        moveRobot(targetX, targetY, 10, dimension);
+    }
+
+    private void moveRobot(double x, double y, double duration, Dimension dimension) {
+        double distance = distance(x, y, robotPositionX, robotPositionY);
         if (distance < 0.5) {
             return;
         }
-        double angleToTarget = angleTo(robotPositionX, robotPositionY, targetX, targetY);
+        double angleToTarget = angleTo(robotPositionX, robotPositionY, x, y);
         double angularVelocity = 0;
         if (angleToTarget > robotDirection) {
             angularVelocity = maxAngularVelocity;
@@ -38,12 +43,9 @@ public class Robot {
             angularVelocity = -maxAngularVelocity;
         }
 
-        moveRobot(maxVelocity, angularVelocity, 10, dimension);
-    }
-
-    private void moveRobot(double velocity, double angularVelocity, double duration, Dimension dimension) {
-        velocity = applyLimits(velocity, 0, maxVelocity);
+        double velocity = maxVelocity;
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+
         double newX = robotPositionX + velocity / angularVelocity *
                 (Math.sin(robotDirection + angularVelocity * duration) -
                         Math.sin(robotDirection));
@@ -56,8 +58,10 @@ public class Robot {
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
+
         robotPositionX = applyLimits(newX, 0, dimension.width * 2);
         robotPositionY = applyLimits(newY, 0, dimension.height * 2);
+
         double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration + bounceAngle(newX, newY));
         robotDirection = newDirection;
     }

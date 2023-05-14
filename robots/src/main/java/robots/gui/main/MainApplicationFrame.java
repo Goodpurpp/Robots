@@ -11,6 +11,7 @@ import robots.gui.common.RobotsJFrame;
 import robots.gui.common.RobotsJFrameState;
 import robots.gui.common.RobotsLocaleChangeAdapter;
 import robots.gui.game.GameWindow;
+import robots.gui.input.InputWindow;
 import robots.gui.log.LogWindow;
 import robots.gui.main.menu.JMenuFactory;
 import robots.gui.common.PathEnum;
@@ -31,6 +32,9 @@ public class MainApplicationFrame extends RobotsJFrame {
 
         GameWindow gameWindow = new GameWindow();
         this.addWindow(gameWindow);
+
+        InputWindow inputWindow = new InputWindow();
+        addWindow(inputWindow);
 
         this.setJMenuBar(generateMenuBar());
     }
