@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import lombok.SneakyThrows;
 import robots.gui.common.RobotsInternalFrameAdapter;
 import robots.gui.common.RobotsJInternalFrame;
 import robots.gui.common.RobotsJInternalFrameState;
@@ -24,9 +25,7 @@ public class LogWindow extends RobotsJInternalFrame implements LogChangeListener
 
     public LogWindow(LogWindowSource logSource) {
         super(RobotsLocalisation.getString("log.message.start"), true, true, true, true,PathEnum.LOG_WINDOW_JSON_PATH.getPath());
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addInternalFrameListener(new LogWindowAdapter());
-        this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
         this.logSource = logSource;
         logSource.registerListener(this);
         logContent = new TextArea("");
@@ -51,26 +50,6 @@ public class LogWindow extends RobotsJInternalFrame implements LogChangeListener
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
-    }
-
-    @Override
-    public RobotsJInternalFrameState writeWindowState() {
-        return new RobotsJInternalFrameState(this.getSize(), this.isMaximum, this.isIcon);
-    }
-
-    @Override
-    public void readWindowState(RobotsJInternalFrameState state) {
-        if (state == null) {
-            this.setLocation(10, 10);
-            this.setSize(300, 800);
-            this.pack();
-            return;
-        }
-
-        this.setSize(state.getDimension());
-        this.isIcon = state.isIcon();
-        this.isMaximum = state.isMaximized();
-        this.pack();
     }
 
     @Override

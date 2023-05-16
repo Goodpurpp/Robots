@@ -2,3 +2,4 @@
 build/
 .gradle/
 app-state/
+.DS_Store/
