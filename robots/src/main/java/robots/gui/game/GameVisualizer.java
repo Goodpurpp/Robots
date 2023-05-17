@@ -1,5 +1,7 @@
 package robots.gui.game;
 
+import robots.gui.common.Pair;
+import robots.gui.game.entity.MouseListener;
 import robots.gui.game.entity.Robot;
 import robots.gui.game.entity.Target;
 import robots.math.RobotsMathKt;
@@ -10,20 +12,23 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
-public class GameVisualizer extends JPanel {
+public class GameVisualizer extends JPanel implements MouseListener {
     private final Timer timer = new Timer("events generator", true);
+    private final List<Pair<Point, Point>> lines = new ArrayList<>();
 
     private volatile Dimension dimension = this.getSize();
 
     private final Target target = new Target(150, 100);
     private final Robot robot = new Robot();
 
-    public GameVisualizer() {
+    public GameVisualizer(MouseTracker tracker) {
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -45,6 +50,7 @@ public class GameVisualizer extends JPanel {
         });
         this.addComponentListener(new GameVisualizerAdapter());
         this.setDoubleBuffered(true);
+        tracker.registerListener(this);
     }
 
     protected void onRedrawEvent() {
@@ -57,6 +63,7 @@ public class GameVisualizer extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         this.drawRobot(g2d, robot);
         this.drawTarget(g2d, target);
+        this.drawLines(g2d, lines);
     }
 
     private void drawRobot(Graphics2D g, Robot robot) {
@@ -91,6 +98,18 @@ public class GameVisualizer extends JPanel {
         drawOval(g, target.getTargetPositionX(), target.getTargetPositionY(), 5, 5);
     }
 
+    private void drawLines(Graphics2D g, List<Pair<Point, Point>> lines) {
+        g.setColor(Color.magenta);
+        for (Pair<Point, Point> line : lines) {
+            g.drawLine(line.first().x, line.first().y, line.second().x, line.second().y);
+        }
+    }
+
+    @Override
+    public void onClickChange(robots.gui.game.entity.MouseEvent e) {
+        EventQueue.invokeLater(this::onRedrawEvent);
+    }
+
     private class GameVisualizerAdapter extends ComponentAdapter {
         @Override
         public void componentResized(ComponentEvent e) {
@@ -102,4 +121,6 @@ public class GameVisualizer extends JPanel {
             dimension = newSize;
         }
     }
+
+
 }

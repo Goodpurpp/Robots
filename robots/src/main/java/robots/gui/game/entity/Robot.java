@@ -56,8 +56,8 @@ public class Robot {
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
-        robotPositionX = applyLimits(newX, 0, dimension.width * 2);
-        robotPositionY = applyLimits(newY, 0, dimension.height * 2);
+        robotPositionX = applyLimits(newX, 0, dimension.width);
+        robotPositionY = applyLimits(newY, 0, dimension.height);
         double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration + bounceAngle(newX, newY));
         robotDirection = newDirection;
     }
