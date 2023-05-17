@@ -15,19 +15,21 @@ import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MouseTracker extends JPanel {
+public class MouseTracker {
     private final List<MouseListener> listeners = new ArrayList<>();
     private final List<MouseClicked> mouseClickedListeners = new ArrayList<>();
     private Point first;
     private Point second;
 
     public MouseTracker() {
-        super();
     }
 
     public void registerListener(MouseListener listener) {
         synchronized (listeners) {
             listeners.add(listener);
+            if (listener instanceof JPanel frame) {
+                frame.addMouseListener(new MouseAdapter());
+            }
         }
     }
 

@@ -21,8 +21,7 @@ public class GameWindow extends RobotsJInternalFrame {
         this.visualizer = new GameVisualizer(mouseTracker);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(visualizer, BorderLayout.CENTER);
-        this.getContentPane()
-            .add(panel);
+        this.getContentPane().add(panel);
         this.pack();
     }
 

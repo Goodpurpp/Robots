@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import robots.localisation.LocalisationChangeable;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicTreeUI;
 import java.beans.PropertyVetoException;
 import java.nio.file.Path;
 
