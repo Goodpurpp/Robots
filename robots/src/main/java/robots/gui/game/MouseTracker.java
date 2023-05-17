@@ -2,16 +2,10 @@ package robots.gui.game;
 
 import robots.gui.game.entity.MouseClicked;
 import robots.gui.game.entity.MouseListener;
-import robots.log.LogChangeListener;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.plaf.basic.BasicListUI;
-import javax.swing.plaf.basic.BasicListUI.MouseInputHandler;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 

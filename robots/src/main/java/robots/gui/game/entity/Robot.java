@@ -2,7 +2,9 @@ package robots.gui.game.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import robots.gui.common.Pair;
 
+import java.util.List;
 import java.awt.*;
 
 import static robots.math.RobotsMathKt.angleTo;
@@ -23,7 +25,7 @@ public class Robot {
     private volatile double robotDirection = 0;
 
 
-    public void onModelUpdateEvent(Target target, Dimension dimension) {
+    public void onModelUpdateEvent(Target target, Dimension dimension, List<Pair<Point, Point>> lines) {
         double targetX = target.getTargetPositionX();
         double targetY = target.getTargetPositionY();
         double distance = distance(targetX, targetY, robotPositionX, robotPositionY);
@@ -38,28 +40,60 @@ public class Robot {
             angularVelocity = -maxAngularVelocity;
         }
 
-        moveRobot(maxVelocity, angularVelocity, 10, dimension);
+        moveRobot(maxVelocity, angularVelocity, 10, dimension, lines);
     }
 
-    private void moveRobot(double velocity, double angularVelocity, double duration, Dimension dimension) {
+    private void moveRobot(double velocity, double angularVelocity, double duration, Dimension dimension, List<Pair<Point, Point>> lines) {
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
-        double newX = robotPositionX + velocity / angularVelocity *
-                (Math.sin(robotDirection + angularVelocity * duration) -
-                        Math.sin(robotDirection));
+        double newX = robotPositionX + velocity / angularVelocity * (Math.sin(robotDirection + angularVelocity * duration) - Math.sin(robotDirection));
         if (!Double.isFinite(newX)) {
             newX = robotPositionX + velocity * duration * Math.cos(robotDirection);
         }
-        double newY = robotPositionY - velocity / angularVelocity *
-                (Math.cos(robotDirection + angularVelocity * duration) -
-                        Math.cos(robotDirection));
+        double newY = robotPositionY - velocity / angularVelocity * (Math.cos(robotDirection + angularVelocity * duration) - Math.cos(robotDirection));
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
-        robotPositionX = applyLimits(newX, 0, dimension.width);
-        robotPositionY = applyLimits(newY, 0, dimension.height);
+        boolean isCrossed = false;
+        for (Pair<Point, Point> currentLine : lines) {
+            double resultOldPointer = (robotPositionX - currentLine.first().x) * (currentLine.second().y - currentLine.first().y) - (robotPositionY - currentLine.first().y) * (currentLine.second().x - currentLine.first().x);
+            double resultNewPointer = (newX - currentLine.first().x) * (currentLine.second().y - currentLine.first().y) - (newY - currentLine.first().y) * (currentLine.second().x - currentLine.first().x);
+            if (Math.signum(resultNewPointer) != Math.signum(resultOldPointer)) {
+                isCrossed = true;
+                Pair<Double, Double> currentPoint = cross(robotPositionX, robotPositionY, newX, newY, currentLine.first().x, currentLine.first().y, currentLine.second().x, currentLine.second().y);
+                robotPositionX = currentPoint.first();
+                robotPositionY = currentPoint.second();
+                break;
+            }
+        }
+        if (!isCrossed) {
+            robotPositionX = applyLimits(newX, 0, dimension.width);
+            robotPositionY = applyLimits(newY, 0, dimension.height);
+        }
+
         double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration + bounceAngle(newX, newY));
         robotDirection = newDirection;
+    }
+
+    private Pair<Double, Double> cross(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+        double resultX;
+        double resultY;
+        double n;
+        if (y2 - y1 != 0) {  // a(y)
+            double q = (x2 - x1) / (y1 - y2);
+            double sn = (x3 - x4) + (y3 - y4) * q;
+//            if (!sn) {
+//                return 0;
+//            }  // c(x) + c(y)*q
+            double fn = (x3 - x1) + (y3 - y1) * q;   // b(x) + b(y)*q
+            n = fn / sn;
+        } else {
+//            if (!(y3 - y4)) { return 0; }  // b(y)
+            n = (y3 - y1) / (y3 - y4);   // c(y)/b(y)
+        }
+        resultX = x3 + (x4 - x3) * n;  // x3 + (-b(x))*n
+        resultY = y3 + (y4 - y3) * n;  // y3 +(-b(y))*n
+        return new Pair<>(resultX, resultY);
     }
 
     private double bounceAngle(double robotNewX, double robotNewY) {

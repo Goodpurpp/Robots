@@ -38,7 +38,7 @@ public class GameVisualizer extends JPanel implements MouseListener {
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                GameVisualizer.this.robot.onModelUpdateEvent(target, dimension);
+                GameVisualizer.this.robot.onModelUpdateEvent(target, dimension, lines);
             }
         }, 0, 10);
         this.addMouseListener(new MouseAdapter() {
@@ -100,6 +100,7 @@ public class GameVisualizer extends JPanel implements MouseListener {
 
     private void drawLines(Graphics2D g, List<Pair<Point, Point>> lines) {
         g.setColor(Color.magenta);
+        System.out.println(lines);
         for (Pair<Point, Point> line : lines) {
             g.drawLine(line.first().x, line.first().y, line.second().x, line.second().y);
         }
@@ -107,6 +108,7 @@ public class GameVisualizer extends JPanel implements MouseListener {
 
     @Override
     public void onClickChange(robots.gui.game.entity.MouseEvent e) {
+        lines.add(new Pair<>(e.getF(), e.getS()));
         EventQueue.invokeLater(this::onRedrawEvent);
     }
 
