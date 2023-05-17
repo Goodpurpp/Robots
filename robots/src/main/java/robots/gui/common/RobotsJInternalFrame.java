@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import robots.localisation.LocalisationChangeable;
 
 import javax.swing.*;
+import java.beans.PropertyVetoException;
 import java.nio.file.Path;
 
 public abstract class RobotsJInternalFrame extends JInternalFrame
@@ -21,7 +22,7 @@ public abstract class RobotsJInternalFrame extends JInternalFrame
         return new RobotsJInternalFrameState(this.getSize(), this.isMaximum, this.isIcon);
     }
 
-    @SneakyThrows
+    //@SneakyThrows
     @Override
     public void readWindowState(RobotsJInternalFrameState state) {
         if (state == null) {
@@ -32,8 +33,11 @@ public abstract class RobotsJInternalFrame extends JInternalFrame
         }
 
         this.setSize(state.getDimension());
-        setIcon(state.isIcon());
-        setMaximum(state.isMaximized());
-        this.pack();
+        try {
+            setIcon(state.isIcon());
+            setMaximum(state.isMaximized());
+        } catch (PropertyVetoException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
