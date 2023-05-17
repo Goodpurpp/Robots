@@ -1,6 +1,7 @@
 import java.util.Map
 
 plugins {
+    kotlin("jvm") version "1.8.0"
     id("java")
 }
 
@@ -17,7 +18,9 @@ repositories {
 }
 
 dependencies {
-
+    implementation("com.google.code.gson:gson:2.10.1")
+    compileOnly("org.projectlombok:lombok:1.18.26")
+    annotationProcessor("org.projectlombok:lombok:1.18.26")
 }
 
 tasks.compileJava {
