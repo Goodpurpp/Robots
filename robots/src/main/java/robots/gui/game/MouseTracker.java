@@ -1,8 +1,5 @@
 package robots.gui.game;
 
-import robots.gui.game.entity.MouseClicked;
-import robots.gui.game.entity.MouseListener;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -34,7 +31,7 @@ public class MouseTracker {
     }
 
     private void invokeLister() {
-        var event = new robots.gui.game.entity.MouseEvent(this.first, this.second);
+        var event = new robots.gui.game.MouseEvent(this.first, this.second);
         listeners.forEach(l -> l.onClickChange(event));
     }
 
@@ -47,19 +44,25 @@ public class MouseTracker {
 
     private class MouseAdapter extends java.awt.event.MouseAdapter {
 
+        private CooldownSkillTimer skillTimer = new CooldownSkillTimer();
+
         @Override
         public void mousePressed(MouseEvent e) {
+            System.out.println(skillTimer.isDown());
             MouseTracker.this.first = e.getPoint();
-            System.out.println("____PRESSED___");
-            System.out.println(Double.toString(e.getX()) + " " + Double.toString(e.getY()));
+//            System.out.println("____PRESSED____");
+//            System.out.println(Double.toString(e.getX()) + " " + Double.toString(e.getY()));
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             MouseTracker.this.second = e.getPoint();
-            MouseTracker.this.invokeLister();
-            System.out.println("____RELEASED____");
-            System.out.println(Double.toString(e.getX()) + " " + Double.toString(e.getY()));
+            if (skillTimer.isDown()) {
+                skillTimer.update();
+                MouseTracker.this.invokeLister();
+            }
+//            System.out.println("____RELEASED____");
+//            System.out.println(Double.toString(e.getX()) + " " + Double.toString(e.getY()));
         }
 
     }

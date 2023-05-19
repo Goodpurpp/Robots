@@ -1,4 +1,4 @@
-package robots.gui.game.entity;
+package robots.gui.game;
 
 import lombok.Data;
 

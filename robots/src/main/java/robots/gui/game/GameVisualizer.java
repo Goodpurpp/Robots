@@ -1,7 +1,6 @@
 package robots.gui.game;
 
 import robots.gui.common.Pair;
-import robots.gui.game.entity.MouseListener;
 import robots.gui.game.entity.Robot;
 import robots.gui.game.entity.Target;
 import robots.math.RobotsMathKt;
@@ -21,6 +20,7 @@ import javax.swing.JPanel;
 
 public class GameVisualizer extends JPanel implements MouseListener {
     private final Timer timer = new Timer("events generator", true);
+//    private CooldownSkillTimer skillTimer = new CooldownSkillTimer();
     private final List<Pair<Point, Point>> lines = new ArrayList<>();
 
     private volatile Dimension dimension = this.getSize();
@@ -107,7 +107,7 @@ public class GameVisualizer extends JPanel implements MouseListener {
     }
 
     @Override
-    public void onClickChange(robots.gui.game.entity.MouseEvent e) {
+    public void onClickChange(robots.gui.game.MouseEvent e) {
         lines.add(new Pair<>(e.getF(), e.getS()));
         EventQueue.invokeLater(this::onRedrawEvent);
     }

@@ -59,10 +59,11 @@ public class Robot {
             double resultOldPointer = (robotPositionX - currentLine.first().x) * (currentLine.second().y - currentLine.first().y) - (robotPositionY - currentLine.first().y) * (currentLine.second().x - currentLine.first().x);
             double resultNewPointer = (newX - currentLine.first().x) * (currentLine.second().y - currentLine.first().y) - (newY - currentLine.first().y) * (currentLine.second().x - currentLine.first().x);
             if (Math.signum(resultNewPointer) != Math.signum(resultOldPointer)) {
+                System.out.println("is crossed");
                 isCrossed = true;
                 Pair<Double, Double> currentPoint = cross(robotPositionX, robotPositionY, newX, newY, currentLine.first().x, currentLine.first().y, currentLine.second().x, currentLine.second().y);
-                robotPositionX = currentPoint.first();
-                robotPositionY = currentPoint.second();
+                newX = currentPoint.first();
+                newY = currentPoint.second();
                 break;
             }
         }
@@ -79,7 +80,7 @@ public class Robot {
         double resultX;
         double resultY;
         double n;
-        if (y2 - y1 != 0) {  // a(y)
+        if (y2 - y1 > Double.MIN_NORMAL) {  // a(y)
             double q = (x2 - x1) / (y1 - y2);
             double sn = (x3 - x4) + (y3 - y4) * q;
 //            if (!sn) {
