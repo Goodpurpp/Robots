@@ -116,31 +116,21 @@ public class GameVisualizer extends JPanel implements MouseListener {
 
     @Override
     public void onClickChange(robots.gui.game.MouseEvent e) {
-        if (lines.size() > 2) {
-            Map<Pair<Point, Point>, Set<Pair<Point, Point>>> intersectingLines = new HashMap<>();
-            for (Pair<Point, Point> line : lines) {
-                for (Pair<Point, Point> line1 : lines) {
-                    if (line == line1) {
-                        continue;
-                    }
+        List<Pair<Point, Point>> copyLines = new ArrayList<>(lines);
+        copyLines.add(new Pair<>(e.getF(), e.getS()));
+        Map<Pair<Point, Point>, Set<Pair<Point, Point>>> intersectingLines = new HashMap<>();
+        for (Pair<Point, Point> line : copyLines) {
+            for (Pair<Point, Point> line1 : copyLines) {
+                if (line == line1) {
+                    continue;
+                }
 
-                    if (isIntersectingLines(line, line1)) {
-                        intersectingLines.compute(line, (k, v) -> v == null ? new HashSet<>(List.of(line1)) : add(v, line1));
-                    }
+                if (isIntersectingLines(line, line1)) {
+                    intersectingLines.compute(line, (k, v) -> v == null ? new HashSet<>(List.of(line1)) : add(v, line1));
                 }
             }
-            Set<Set<Pair<Point, Point>>> i = intersectingLines.entrySet().stream()
-                    .filter(el -> el.getValue().size() > 2)
-                    .map(this::flaten)
-                    .collect(Collectors.toSet());
-            List<Set<Pair<Point, Point>>> res = i.stream().filter(this::isInter).toList();
-
-            if (res.isEmpty()) {
-                lines.add(new Pair<>(e.getF(), e.getS()));
-            }
-        } else {
-            lines.add(new Pair<>(e.getF(), e.getS()));
         }
+        lines.add(new Pair<>(e.getF(), e.getS()));
         EventQueue.invokeLater(this::repaint);
     }
 
