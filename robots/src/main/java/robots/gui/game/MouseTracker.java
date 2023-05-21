@@ -8,18 +8,13 @@ import java.util.List;
 
 public class MouseTracker {
     private final List<MouseListener> listeners = new ArrayList<>();
-    private final List<MouseClicked> mouseClickedListeners = new ArrayList<>();
-    private Point first;
-    private Point second;
-
-    public MouseTracker() {
-    }
+    private final MouseAdapter mouseAdapter = new MouseAdapter();
 
     public void registerListener(MouseListener listener) {
         synchronized (listeners) {
-            listeners.add(listener);
             if (listener instanceof JPanel frame) {
-                frame.addMouseListener(new MouseAdapter());
+                listeners.add(listener);
+                frame.addMouseListener(mouseAdapter);
             }
         }
     }
@@ -30,41 +25,28 @@ public class MouseTracker {
         }
     }
 
-    private void invokeLister() {
-        var event = new robots.gui.game.MouseEvent(this.first, this.second);
+    private void invokeListeners(robots.gui.game.MouseEvent event) {
         listeners.forEach(l -> l.onClickChange(event));
-    }
-
-    private void invokeClick() {
-        var event = new MouseClickedEvent();
-        mouseClickedListeners.forEach(l -> l.mouseClicked(event));
-
     }
 
 
     private class MouseAdapter extends java.awt.event.MouseAdapter {
-
-        private CooldownSkillTimer skillTimer = new CooldownSkillTimer();
+        private Point first;
+        private final CooldownSkillTimer skillTimer = new CooldownSkillTimer();
 
         @Override
         public void mousePressed(MouseEvent e) {
             System.out.println(skillTimer.isDown());
-            MouseTracker.this.first = e.getPoint();
-//            System.out.println("____PRESSED____");
-//            System.out.println(Double.toString(e.getX()) + " " + Double.toString(e.getY()));
+            first = e.getPoint();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            MouseTracker.this.second = e.getPoint();
+            Point second = e.getPoint();
             if (skillTimer.isDown()) {
                 skillTimer.update();
-                MouseTracker.this.invokeLister();
+                MouseTracker.this.invokeListeners(new robots.gui.game.MouseEvent((Point) first.clone(), (Point) second.clone()));
             }
-//            System.out.println("____RELEASED____");
-//            System.out.println(Double.toString(e.getX()) + " " + Double.toString(e.getY()));
         }
-
     }
-
 }

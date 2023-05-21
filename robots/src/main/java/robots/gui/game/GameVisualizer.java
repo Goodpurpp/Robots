@@ -10,17 +10,26 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 
+import static robots.math.RobotsMathKt.isIntersectingLines;
+
 public class GameVisualizer extends JPanel implements MouseListener {
     private final Timer timer = new Timer("events generator", true);
-//    private CooldownSkillTimer skillTimer = new CooldownSkillTimer();
     private final List<Pair<Point, Point>> lines = new ArrayList<>();
 
     private volatile Dimension dimension = this.getSize();
@@ -100,7 +109,6 @@ public class GameVisualizer extends JPanel implements MouseListener {
 
     private void drawLines(Graphics2D g, List<Pair<Point, Point>> lines) {
         g.setColor(Color.magenta);
-        System.out.println(lines);
         for (Pair<Point, Point> line : lines) {
             g.drawLine(line.first().x, line.first().y, line.second().x, line.second().y);
         }
@@ -108,8 +116,58 @@ public class GameVisualizer extends JPanel implements MouseListener {
 
     @Override
     public void onClickChange(robots.gui.game.MouseEvent e) {
-        lines.add(new Pair<>(e.getF(), e.getS()));
-        EventQueue.invokeLater(this::onRedrawEvent);
+        if (lines.size() > 2) {
+            Map<Pair<Point, Point>, Set<Pair<Point, Point>>> intersectingLines = new HashMap<>();
+            for (Pair<Point, Point> line : lines) {
+                for (Pair<Point, Point> line1 : lines) {
+                    if (line == line1) {
+                        continue;
+                    }
+
+                    if (isIntersectingLines(line, line1)) {
+                        intersectingLines.compute(line, (k, v) -> v == null ? new HashSet<>(List.of(line1)) : add(v, line1));
+                    }
+                }
+            }
+            Set<Set<Pair<Point, Point>>> i = intersectingLines.entrySet().stream()
+                    .filter(el -> el.getValue().size() > 2)
+                    .map(this::flaten)
+                    .collect(Collectors.toSet());
+            List<Set<Pair<Point, Point>>> res = i.stream().filter(this::isInter).toList();
+
+            if (res.isEmpty()) {
+                lines.add(new Pair<>(e.getF(), e.getS()));
+            }
+        } else {
+            lines.add(new Pair<>(e.getF(), e.getS()));
+        }
+        EventQueue.invokeLater(this::repaint);
+    }
+
+    private Set<Pair<Point, Point>> add(Set<Pair<Point, Point>> set, Pair<Point, Point> el) {
+        set.add(el);
+        return set;
+    }
+
+    private Set<Pair<Point, Point>> flaten(Entry<Pair<Point, Point>, Set<Pair<Point, Point>>> entry) {
+        entry.getValue().add(entry.getKey());
+        return entry.getValue();
+    }
+
+    private boolean isInter(Set<Pair<Point, Point>> set) {
+        for (Pair<Point, Point> a : set) {
+            for (Pair<Point, Point> b : set) {
+                if (a == b) {
+                    continue;
+                }
+
+                boolean isIntersecting = isIntersectingLines(a, b);
+                if (!isIntersecting) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private class GameVisualizerAdapter extends ComponentAdapter {
@@ -123,6 +181,4 @@ public class GameVisualizer extends JPanel implements MouseListener {
             dimension = newSize;
         }
     }
-
-
 }

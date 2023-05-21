@@ -11,6 +11,7 @@ import static robots.math.RobotsMathKt.angleTo;
 import static robots.math.RobotsMathKt.applyLimits;
 import static robots.math.RobotsMathKt.asNormalizedRadians;
 import static robots.math.RobotsMathKt.distance;
+import static robots.math.RobotsMathKt.isIntersecting;
 
 @RequiredArgsConstructor
 public class Robot {
@@ -56,12 +57,14 @@ public class Robot {
         }
         boolean isCrossed = false;
         for (Pair<Point, Point> currentLine : lines) {
-            double resultOldPointer = (robotPositionX - currentLine.first().x) * (currentLine.second().y - currentLine.first().y) - (robotPositionY - currentLine.first().y) * (currentLine.second().x - currentLine.first().x);
-            double resultNewPointer = (newX - currentLine.first().x) * (currentLine.second().y - currentLine.first().y) - (newY - currentLine.first().y) * (currentLine.second().x - currentLine.first().x);
-            if (Math.signum(resultNewPointer) != Math.signum(resultOldPointer)) {
-                System.out.println("is crossed");
+            if (isIntersecting(new Pair<>(new Pair<>(newX, newY), new Pair<>(robotPositionX, robotPositionY)), currentLine)) {
+                Pair<Double, Double> currentPoint = cross(
+                        robotPositionX, robotPositionY,
+                        newX, newY,
+                        currentLine.first().x, currentLine.first().y,
+                        currentLine.second().x, currentLine.second().y
+                );
                 isCrossed = true;
-                Pair<Double, Double> currentPoint = cross(robotPositionX, robotPositionY, newX, newY, currentLine.first().x, currentLine.first().y, currentLine.second().x, currentLine.second().y);
                 newX = currentPoint.first();
                 newY = currentPoint.second();
                 break;

@@ -1,6 +1,5 @@
 package robots.gui.game;
 
-
 import robots.gui.common.RobotsJInternalFrame;
 import robots.gui.common.PathEnum;
 import robots.localisation.RobotsLocalisation;
@@ -8,6 +7,8 @@ import robots.localisation.RobotsLocalisation;
 import java.awt.BorderLayout;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 public class GameWindow extends RobotsJInternalFrame {
     private final GameVisualizer visualizer;
@@ -18,13 +19,20 @@ public class GameWindow extends RobotsJInternalFrame {
         this.visualizer = new GameVisualizer(mouseTracker);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(visualizer, BorderLayout.CENTER);
-        this.getContentPane()
-            .add(panel);
+        this.getContentPane().add(panel);
+        addInternalFrameListener(new GameWindowListener());
         this.pack();
     }
 
     @Override
     public void changeLocalisation() {
         this.setTitle(RobotsLocalisation.getString("game.field.name"));
+    }
+
+    private class GameWindowListener extends InternalFrameAdapter {
+        @Override
+        public void internalFrameClosed(InternalFrameEvent e) {
+            GameWindow.this.mouseTracker.unregisterListener(GameWindow.this.visualizer);
+        }
     }
 }

@@ -10,10 +10,10 @@ public class CooldownSkillTimer {
     public CooldownSkillTimer() {
         cooldown = Instant.now();
     }
-    public void update() {
+    public synchronized void update() {
         cooldown = Instant.now();
     }
-    public boolean isDown() {
-        return Duration.between(cooldown,Instant.now()).compareTo(Duration.ofSeconds(10)) > 0;
+    public synchronized boolean isDown() {
+        return Duration.between(cooldown, Instant.now()).compareTo(Duration.ofSeconds(10)) > 0;
     }
 }
