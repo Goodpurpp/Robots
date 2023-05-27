@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import robots.gui.common.Pair;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.awt.*;
+import java.util.Set;
 
 import static robots.math.RobotsMathKt.angleTo;
 import static robots.math.RobotsMathKt.applyLimits;
@@ -24,7 +27,7 @@ public class Robot {
     private volatile double robotPositionY = 100;
     @Getter
     private volatile double robotDirection = 0;
-
+    private final double radius = 10;
 
     public void onModelUpdateEvent(Target target, Dimension dimension, List<Pair<Point, Point>> lines) {
         double targetX = target.getTargetPositionX();
@@ -40,8 +43,11 @@ public class Robot {
         } else if (angleToTarget < robotDirection) {
             angularVelocity = -maxAngularVelocity;
         }
-
-        moveRobot(maxVelocity, angularVelocity, 10, dimension, lines);
+        if (isCrossed(lines)) {
+            ...
+        } else {
+            moveRobot(maxVelocity, angularVelocity, 10, dimension, lines);
+        }
     }
 
     private void moveRobot(double velocity, double angularVelocity, double duration, Dimension dimension, List<Pair<Point, Point>> lines) {
@@ -56,30 +62,15 @@ public class Robot {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
         boolean isCrossed = false;
-        for (Pair<Point, Point> currentLine : lines) {
-            if (isIntersecting(new Pair<>(new Pair<>(newX, newY), new Pair<>(robotPositionX, robotPositionY)), currentLine)) {
-                Pair<Double, Double> currentPoint = cross(
-                        robotPositionX, robotPositionY,
-                        newX, newY,
-                        currentLine.first().x, currentLine.first().y,
-                        currentLine.second().x, currentLine.second().y
-                );
-                isCrossed = true;
-                newX = currentPoint.first();
-                newY = currentPoint.second();
-                break;
-            }
-        }
-        if (!isCrossed) {
-            robotPositionX = applyLimits(newX, 0, dimension.width);
-            robotPositionY = applyLimits(newY, 0, dimension.height);
-        }
+        robotPositionX = applyLimits(newX, 0, dimension.width);
+        robotPositionY = applyLimits(newY, 0, dimension.height);
 
         double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration + bounceAngle(newX, newY));
         robotDirection = newDirection;
     }
 
-    private Pair<Double, Double> cross(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    private Pair<Double, Double> cross(double x1, double y1, double x2, double y2, double x3, double y3,
+                                       double x4, double y4) {
         double resultX;
         double resultY;
         double n;
@@ -110,5 +101,35 @@ public class Robot {
         double newY = Math.round(robotPositionY * yScalar);
         robotPositionX = newX;
         robotPositionY = newY;
+    }
+
+    private boolean isCrossed(List<Pair<Point, Point>> lines) {
+        boolean isCrossed = false;
+        for (Pair<Point, Point> currentLine : lines) {
+            for (int i = -1; i < 2; i += 2) {
+                for (int j = -1; j < 2; j += 2) {
+                    if (isIntersecting(new Pair<>(new Pair<>(robotPositionX + radius * i, robotPositionY + radius * j), new Pair<>(robotPositionX, robotPositionY)), currentLine)) {
+                        isCrossed = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return isCrossed;
+    }
+
+    private void replaceDirection(List<Pair<Point, Point>> lines) {
+        Set<Pair<Pair<Double, Double>, Pair<Double, Double>>> crossedLines = new HashSet<>();
+        boolean isCrossed = false;
+        for (Pair<Point, Point> currentLine : lines) {
+            for (int i = -1; i < 2; i += 2) {
+                for (int j = -1; j < 2; j += 2) {
+                    var line = new Pair<>(new Pair<>(robotPositionX + radius * i, robotPositionY + radius * j), new Pair<>(robotPositionX, robotPositionY));
+                    if (isIntersecting(line, currentLine)) {
+                        crossedLines.add(line);
+                    }
+                }
+            }
+        }
     }
 }
