@@ -35,6 +35,7 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
     private final Target target = new Target(150, 100);
     private final Robot robot = new Robot();
 
+
     public GameVisualizer(MouseTracker tracker) {
         this.timer.schedule(new TimerTask() {
             @Override
@@ -108,7 +109,10 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
     private void drawLines(Graphics2D g, List<Pair<Point, Point>> lines) {
         g.setColor(Color.magenta);
         for (Pair<Point, Point> line : lines) {
-            g.drawLine(line.first().x, line.first().y, line.second().x, line.second().y);
+            g.drawLine(line.first().x,
+                    line.first().y,
+                    line.second().x ,
+                    line.second().y);
         }
     }
 
@@ -129,11 +133,15 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
                     }
                 }
             }
-            Set<Set<Pair<Point, Point>>> i = intersectingLines.entrySet().stream()
-                    .filter(el -> el.getValue().size() >= 2)
-                    .map(this::flatten)
-                    .collect(Collectors.toSet());
-            List<Set<Pair<Point, Point>>> figures = i.stream().filter(this::isFormFigure).toList();
+            Set<Set<Pair<Point, Point>>> i = intersectingLines.entrySet()
+                                                              .stream()
+                                                              .filter(el -> el.getValue()
+                                                                              .size() >= 2)
+                                                              .map(this::flatten)
+                                                              .collect(Collectors.toSet());
+            List<Set<Pair<Point, Point>>> figures = i.stream()
+                                                     .filter(this::isFormFigure)
+                                                     .toList();
 
             if (figures.isEmpty()) {
                 lines.add(new Pair<>(e.getF(), e.getS()));
@@ -150,7 +158,8 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
     }
 
     private Set<Pair<Point, Point>> flatten(Entry<Pair<Point, Point>, Set<Pair<Point, Point>>> entry) {
-        entry.getValue().add(entry.getKey());
+        entry.getValue()
+             .add(entry.getKey());
         return entry.getValue();
     }
 
