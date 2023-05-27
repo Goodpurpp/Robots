@@ -22,11 +22,16 @@ public class MouseTracker {
     public void unregisterListener(RobotsMouseListener listener) {
         synchronized (listeners) {
             listeners.remove(listener);
+            if (listener instanceof JPanel frame) {
+                frame.removeMouseListener(mouseAdapter);
+            }
         }
     }
 
     private void invokeListeners(RobotsMouseEvent event) {
-        listeners.forEach(l -> l.onClickChange(event));
+        synchronized (listeners) {
+            listeners.forEach(l -> l.onClickChange(event));
+        }
     }
 
 

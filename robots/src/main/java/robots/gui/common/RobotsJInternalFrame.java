@@ -12,7 +12,7 @@ public abstract class RobotsJInternalFrame extends JInternalFrame
     public RobotsJInternalFrame(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable, Path serializedPath) {
         super(title, resizable, closable, maximizable, iconifiable);
         this.addInternalFrameListener(new RobotsInternalFrameAdapter(this, serializedPath));
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
     }
 

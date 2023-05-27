@@ -8,12 +8,8 @@ import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import lombok.SneakyThrows;
-import robots.gui.common.RobotsInternalFrameAdapter;
 import robots.gui.common.RobotsJInternalFrame;
-import robots.gui.common.RobotsJInternalFrameState;
 import robots.gui.common.PathEnum;
-import robots.gui.common.RobotsLocaleChangeAdapter;
 import robots.localisation.RobotsLocalisation;
 import robots.log.LogChangeListener;
 import robots.log.LogEntry;
