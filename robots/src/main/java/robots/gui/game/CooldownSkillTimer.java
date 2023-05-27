@@ -16,6 +16,6 @@ public class CooldownSkillTimer {
     }
 
     public synchronized boolean isDown() {
-        return Duration.between(cooldown, Instant.now()).compareTo(Duration.ofSeconds(1)) > 0;
+        return Duration.between(cooldown, Instant.now()).compareTo(Duration.ofSeconds(10)) > 0;
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.awt.*;
 
 @Data
-public class MouseEvent {
+public class RobotsMouseEvent {
     private final Point f;
     private final Point s;
 }

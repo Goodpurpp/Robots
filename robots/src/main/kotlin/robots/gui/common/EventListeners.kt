@@ -17,22 +17,6 @@ class RobotsWindowAdapter(
     private val window: RobotsJFrame,
     private val jsonPath: Path
 ) : WindowAdapter() {
-    override fun windowOpened(e: WindowEvent?) {
-        val gsonHelper = GsonHelper<RobotsJFrameState>()
-        gsonHelper.loadFromJson(jsonPath, RobotsJFrameState::class.java)?.let {
-            window.readWindowState(
-                when (askUserForLoadState(window)) {
-                    JOptionPane.YES_OPTION -> {
-                        it
-                    }
-
-                    else -> {
-                        null
-                    }
-                }
-            )
-        }
-    }
 
     override fun windowClosing(event: WindowEvent) {
         when (askUserForCloseComponent(window)) {
@@ -55,33 +39,6 @@ class RobotsInternalFrameAdapter(
     private val internalFrame: RobotsJInternalFrame,
     private val jsonPath: Path
 ) : InternalFrameAdapter() {
-    override fun internalFrameOpened(e: InternalFrameEvent?) {
-        val gsonHelper = GsonHelper<RobotsJInternalFrameState>()
-        gsonHelper.loadFromJson(jsonPath, RobotsJInternalFrameState::class.java)?.let {
-            internalFrame.readWindowState(
-                when (askUserForLoadState(internalFrame)) {
-                    JOptionPane.YES_OPTION -> {
-                        it
-                    }
-
-                    else -> {
-                        null
-                    }
-                }
-            )
-        }
-    }
-
-    override fun internalFrameClosing(event: InternalFrameEvent?) {
-        when (askUserForCloseComponent(internalFrame)) {
-            JOptionPane.YES_OPTION -> {
-                internalFrame.isVisible = false
-                internalFrame.dispose()
-            }
-
-            JOptionPane.NO_OPTION -> {}
-        }
-    }
 
     override fun internalFrameClosed(e: InternalFrameEvent?) {
         val gsonHelper = GsonHelper<RobotsJInternalFrameState>()
@@ -100,7 +57,7 @@ class RobotsLocaleChangeAdapter(
     }
 }
 
-private fun askUserForLoadState(component: Component?): Int =
+fun askUserForLoadState(component: Component?): Int =
     JOptionPane.showOptionDialog(
         component,
         RobotsLocalisation.getString("state.message"),

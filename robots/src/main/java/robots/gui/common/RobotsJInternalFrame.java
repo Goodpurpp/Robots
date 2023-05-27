@@ -1,10 +1,8 @@
 package robots.gui.common;
 
-import lombok.SneakyThrows;
 import robots.localisation.LocalisationChangeable;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicTreeUI;
 import java.beans.PropertyVetoException;
 import java.nio.file.Path;
 
@@ -23,7 +21,6 @@ public abstract class RobotsJInternalFrame extends JInternalFrame
         return new RobotsJInternalFrameState(this.getSize(), this.isMaximum, this.isIcon);
     }
 
-    //@SneakyThrows
     @Override
     public void readWindowState(RobotsJInternalFrameState state) {
         if (state == null) {

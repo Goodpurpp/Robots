@@ -6,9 +6,11 @@ import java.beans.PropertyVetoException;
 import javax.swing.*;
 
 import lombok.Getter;
+import robots.gui.common.GsonHelper;
 import robots.gui.common.Pair;
 import robots.gui.common.RobotsJFrame;
 import robots.gui.common.RobotsJFrameState;
+import robots.gui.common.RobotsJInternalFrameState;
 import robots.gui.common.RobotsLocaleChangeAdapter;
 import robots.gui.game.GameWindow;
 import robots.gui.log.LogWindow;
@@ -17,9 +19,12 @@ import robots.gui.common.PathEnum;
 import robots.localisation.RobotsLocalisation;
 import robots.log.Logger;
 
+import static robots.gui.common.EventListenersKt.askUserForLoadState;
+
 public class MainApplicationFrame extends RobotsJFrame {
     @Getter
     private final JDesktopPane desktopPane = new JDesktopPane();
+
 
     public MainApplicationFrame() {
         super(PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath());
@@ -27,12 +32,22 @@ public class MainApplicationFrame extends RobotsJFrame {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addPropertyChangeListener("localisation", new RobotsLocaleChangeAdapter(this));
 
-        this.addWindow(createLogWindow());
+        LogWindow logWindow = createLogWindow();
+        this.addWindow(logWindow);
 
         GameWindow gameWindow = new GameWindow();
         this.addWindow(gameWindow);
 
         this.setJMenuBar(generateMenuBar());
+
+        int res = askUserForLoadState(this);
+        if (res == JOptionPane.YES_OPTION) {
+            GsonHelper<RobotsJInternalFrameState> internalFrameReader = new GsonHelper<>();
+            GsonHelper<RobotsJFrameState> mainApplicationReader = new GsonHelper<>();
+            readWindowState(mainApplicationReader.loadFromJson(PathEnum.MAIN_APPLICATION_FRAME_JSON.getPath(), RobotsJFrameState.class));
+            logWindow.readWindowState(internalFrameReader.loadFromJson(PathEnum.LOG_WINDOW_JSON_PATH.getPath(), RobotsJInternalFrameState.class));
+            gameWindow.readWindowState(internalFrameReader.loadFromJson(PathEnum.GAME_WINDOW_JSON_PATH.getPath(), RobotsJInternalFrameState.class));
+        }
     }
 
     @Override
@@ -63,11 +78,6 @@ public class MainApplicationFrame extends RobotsJFrame {
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
-    }
-
-    protected void removeWindow(JInternalFrame frame) {
-        desktopPane.remove(frame);
-        frame.setVisible(false);
     }
 
     private JMenuBar generateMenuBar() {
