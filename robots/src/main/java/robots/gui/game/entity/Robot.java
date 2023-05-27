@@ -83,20 +83,16 @@ public class Robot {
         double resultX;
         double resultY;
         double n;
-        if (y2 - y1 > Double.MIN_NORMAL) {  // a(y)
+        if (y2 - y1 > Double.MIN_NORMAL) {
             double q = (x2 - x1) / (y1 - y2);
             double sn = (x3 - x4) + (y3 - y4) * q;
-//            if (!sn) {
-//                return 0;
-//            }  // c(x) + c(y)*q
-            double fn = (x3 - x1) + (y3 - y1) * q;   // b(x) + b(y)*q
+            double fn = (x3 - x1) + (y3 - y1) * q;
             n = fn / sn;
         } else {
-//            if (!(y3 - y4)) { return 0; }  // b(y)
-            n = (y3 - y1) / (y3 - y4);   // c(y)/b(y)
+            n = (y3 - y1) / (y3 - y4);
         }
-        resultX = x3 + (x4 - x3) * n;  // x3 + (-b(x))*n
-        resultY = y3 + (y4 - y3) * n;  // y3 +(-b(y))*n
+        resultX = x3 + (x4 - x3) * n;
+        resultY = y3 + (y4 - y3) * n;
         return new Pair<>(resultX, resultY);
     }
 
