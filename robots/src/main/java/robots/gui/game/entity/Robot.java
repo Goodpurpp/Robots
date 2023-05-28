@@ -105,25 +105,56 @@ public class Robot {
             return new Pair<>(targetX, targetY);
         }
 
-        List<Pair<Double, Double>> correctPoints = new ArrayList<>();
-        for (var line : lines) {
-            if (targetIsOpen(lines, line.first().x, line.first().y, currX, currY) && isNotOnBorder(line.first(), dimension)) {
-                correctPoints.add(new Pair<>((double)line.first().x, (double)line.first().y));
-            }
-            if (targetIsOpen(lines, line.second().x, line.second().y, currX, currY) && isNotOnBorder(line.second(), dimension)) {
-                correctPoints.add(new Pair<>((double)line.second().x, (double)line.second().y));
-            }
-        }
+        List<Pair<Double, Double>> correctPoints = findOpenPoints(lines, currX, currY, dimension);
         double minLength = Double.MAX_VALUE;
         Pair<Double, Double> minPoint = null;
         for (var point : correctPoints) {
-            double length = distance(point.first(), point.second(), targetX, targetY);
-            if (minLength > length) {
-                minPoint = point;
-                minLength = length;
+            if (havePathToTarget(lines, targetX, targetY, point, dimension)) {
+                double length = distance(point.first(), point.second(), targetX, targetY);
+                if (minLength > length) {
+                    minPoint = point;
+                    minLength = length;
+                }
             }
         }
         return minPoint;
+    }
+
+    private List<Pair<Double, Double>> findOpenPoints(List<Pair<Point, Point>> lines, double currX, double currY, Dimension dimension) {
+        List<Pair<Double, Double>> correctPoints = new ArrayList<>();
+        for (var line : lines) {
+            if (targetIsOpen(lines, line.first().x, line.first().y, currX, currY) && isNotOnBorder(line.first(), dimension)) {
+                correctPoints.add(new Pair<>((double) line.first().x, (double) line.first().y));
+            }
+            if (targetIsOpen(lines, line.second().x, line.second().y, currX, currY) && isNotOnBorder(line.second(), dimension)) {
+                correctPoints.add(new Pair<>((double) line.second().x, (double) line.second().y));
+            }
+        }
+        return correctPoints;
+    }
+
+    private boolean havePathToTarget(List<Pair<Point, Point>> lines, double targetX, double targetY, Pair<Double, Double> start, Dimension dimension) {
+        Set<Pair<Double, Double>> visited = new HashSet<>();
+        Stack<Pair<Double, Double>> stack = new Stack<>();
+        stack.push(start);
+        while (!stack.isEmpty()) {
+            Pair<Double, Double> curr = stack.pop();
+            visited.add(curr);
+            List<Pair<Double, Double>> correctPoints = findOpenPoints(lines, curr.first(), curr.second(), dimension).stream()
+                    .filter(e -> !visited.contains(e))
+                    .toList();
+            if (correctPoints.size() == 0) {
+                return true;
+            }
+            for (var a : correctPoints) {
+                if (targetIsOpen(lines, targetX, targetY, a.first(), a.second()) && isNotOnBorder(new Point(a.first().intValue(), a.second().intValue()), dimension)) {
+                    return true;
+                } else {
+                    stack.push(a);
+                }
+            }
+        }
+        return false;
     }
 
     private boolean isNotOnBorder(Point point, Dimension dimension) {

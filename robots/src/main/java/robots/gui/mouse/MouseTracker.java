@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static robots.math.RobotsMathKt.distance;
+
 public class MouseTracker {
     private final List<RobotsMouseListener> listeners = new ArrayList<>();
     private final RobotsMouseAdapter mouseAdapter = new RobotsMouseAdapter();
@@ -61,7 +63,7 @@ public class MouseTracker {
         @Override
         public void mouseReleased(MouseEvent e) {
             Point second = e.getPoint();
-            if (skillTimer.isDown() && !second.equals(first)) {
+            if (skillTimer.isDown() && distance(first.x, first.y, second.x, second.y) > 1) {
                 skillTimer.update();
                 MouseTracker.this.invokeListeners(new RobotsMouseEvent((Point) first.clone(), (Point) second.clone()));
             }
