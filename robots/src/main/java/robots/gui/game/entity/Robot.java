@@ -11,9 +11,7 @@ import java.util.List;
 
 import static robots.math.RobotsMathKt.angleTo;
 import static robots.math.RobotsMathKt.applyLimits;
-import static robots.math.RobotsMathKt.asNormalizedRadians;
 import static robots.math.RobotsMathKt.distance;
-import static robots.math.RobotsMathKt.isIntersecting;
 
 @RequiredArgsConstructor
 public class Robot {
@@ -60,7 +58,7 @@ public class Robot {
             d = c;
             c = t;
         }
-        return Math.max(a, c) <= Math.min(b, d);
+        return Math.max(a, c) < Math.min(b, d);
     }
 
     private boolean intersect(Pair<Double, Double> a, Pair<Double, Double> b, Pair<Double, Double> c, Pair<Double, Double> d) {
@@ -81,71 +79,57 @@ public class Robot {
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
-        Pair<Double, Double> point = new Pair<>(targetX,targetY);
-        if (!targetIsOpen(lines, targetX, targetY, robotPositionX, robotPositionY)) {
-            point = isIntersect(lines, targetX, targetY, robotPositionX, robotPositionY, point);
-        }
-        double c = ((point.second() - robotPositionY) / (point.first() - robotPositionX));
-        double arctg = RobotsMathKt.angleTo(robotPositionX, robotPositionY, point.first(), point.second());
-        robotDirection = arctg;
+        Pair<Double, Double> point = findNextPoint(lines, targetX, targetY, robotPositionX, robotPositionY, dimension);
+        robotDirection = RobotsMathKt.angleTo(robotPositionX, robotPositionY, point.first(), point.second());
         robotPositionX = applyLimits(newX, 0, dimension.width);
         robotPositionY = applyLimits(newY, 0, dimension.height);
     }
 
-
-    private double bounceAngle(double robotNewX, double robotNewY) {
-        if (Double.compare(robotNewX, robotPositionX) != 0) {
-            return robotDirection - Math.PI;
-        } else if (Double.compare(robotNewY, robotPositionY) != 0) {
-            return robotDirection - Math.PI / 2;
-        }
-        return 0;
-    }
     private boolean targetIsOpen(List<Pair<Point, Point>> lines, double targetX, double targetY, double robotX, double robotY) {
         for (var line : lines) {
-            if (intersect(new Pair<>(targetX, targetY), new Pair<>(robotX, robotY), new Pair<>((double) line.first().x, (double) line.first().y), new Pair<>(
-                    (double) line.second().x, (double) line.second().y))) {
+            if ((Double.compare(targetX, line.first().x) == 0 && Double.compare(targetY, line.first().y) == 0) ||
+                (Double.compare(targetX, line.second().x) == 0 && Double.compare(targetY, line.second().y) == 0)) {
+                continue;
+            }
+            if (intersect(new Pair<>(targetX, targetY), new Pair<>(robotX, robotY),
+                    new Pair<>((double) line.first().x, (double) line.first().y),
+                    new Pair<>((double) line.second().x, (double) line.second().y))) {
                 return false;
             }
         }
         return true;
     }
 
-    private Pair<Double, Double> isIntersect(List<Pair<Point, Point>> lines, double targetX, double targetY, double robotX, double robotY,Pair<Double,Double> currentPoint) {
-        List<Pair<Pair<Double, Double>, Pair<Double, Double>>> correctLines = new ArrayList<>();
+    private Pair<Double, Double> findNextPoint(List<Pair<Point, Point>> lines, double targetX, double targetY, double currX, double currY, Dimension dimension) {
+        if (targetIsOpen(lines, targetX, targetY, currX, currY)) {
+            return new Pair<>(targetX, targetY);
+        }
+
+        List<Pair<Double, Double>> correctPoints = new ArrayList<>();
         for (var line : lines) {
-            if (intersect(new Pair<>(targetX, targetY), new Pair<>(robotX, robotY), new Pair<>((double) line.first().x, (double) line.first().y), new Pair<>(
-                    (double) line.second().x, (double) line.second().y))) {
-                correctLines.add(new Pair<>(new Pair<>((double) line.first().x, (double) line.first().y), new Pair<>((double) line.second().x, (double) line.second().y)));
+            if (targetIsOpen(lines, line.first().x, line.first().y, currX, currY) && isNotOnBorder(line.first(), dimension)) {
+                correctPoints.add(new Pair<>((double)line.first().x, (double)line.first().y));
+            }
+            if (targetIsOpen(lines, line.second().x, line.second().y, currX, currY) && isNotOnBorder(line.second(), dimension)) {
+                correctPoints.add(new Pair<>((double)line.second().x, (double)line.second().y));
             }
         }
-        double minLength = Double.MIN_VALUE;
-        Pair<Double, Double> minPoint;
-        if (correctLines.size() > 0) {
-            minPoint = correctLines.get(0)
-                                   .first();
-        } else {
-            minPoint = new Pair<>(robotX - 1, robotY );
-        }
-        for (var line : correctLines) {
-            double firstLength = getLength(line.first().first(), line.first().second(), targetX, targetY);
-            double secondLength = getLength(line.second().first(), line.second().second(), targetX, targetY);
-            if (minLength < firstLength) {
-                System.out.println(minLength);
-                minPoint = line.first();
-                minLength = firstLength;
-            }
-            if (minLength < secondLength) {
-                System.out.println(minLength);
-                minPoint = line.second();
-                minLength = secondLength;
+        double minLength = Double.MAX_VALUE;
+        Pair<Double, Double> minPoint = null;
+        for (var point : correctPoints) {
+            double length = distance(point.first(), point.second(), targetX, targetY);
+            if (minLength > length) {
+                minPoint = point;
+                minLength = length;
             }
         }
         return minPoint;
     }
 
-    private double getLength(double x1, double y1, double targetX, double targetY) {
-        return Math.sqrt(Math.pow(targetX - x1, 2) + Math.pow(targetY - y1, 2));
+    private boolean isNotOnBorder(Point point, Dimension dimension) {
+        return Double.compare(point.x, 0) > 0 && Double.compare(point.y, 0) > 0 &&
+                Double.compare(point.x, dimension.width) < 0 &&
+                Double.compare(point.y, dimension.height) < 0;
     }
 
     public void scalePosition(double xScalar, double yScalar) {
@@ -154,5 +138,4 @@ public class Robot {
         robotPositionX = newX;
         robotPositionY = newY;
     }
-
 }

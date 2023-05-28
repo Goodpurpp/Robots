@@ -2,6 +2,7 @@ package robots.gui.game;
 
 import robots.gui.common.RobotsJInternalFrame;
 import robots.gui.common.PathEnum;
+import robots.gui.mouse.MouseTracker;
 import robots.localisation.RobotsLocalisation;
 
 import java.awt.BorderLayout;

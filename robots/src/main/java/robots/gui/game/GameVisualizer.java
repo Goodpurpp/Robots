@@ -3,13 +3,14 @@ package robots.gui.game;
 import robots.gui.common.Pair;
 import robots.gui.game.entity.Robot;
 import robots.gui.game.entity.Target;
+import robots.gui.mouse.MouseTracker;
+import robots.gui.mouse.RobotsMouseEvent;
+import robots.gui.mouse.RobotsMouseListener;
 import robots.math.RobotsMathKt;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,13 +50,6 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
                 GameVisualizer.this.robot.onModelUpdateEvent(target, dimension, lines);
             }
         }, 0, 10);
-        this.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                GameVisualizer.this.target.setTargetPosition(e.getPoint());
-                GameVisualizer.this.repaint();
-            }
-        });
         this.addComponentListener(new GameVisualizerAdapter());
         this.setDoubleBuffered(true);
         tracker.registerListener(this);
@@ -117,10 +111,10 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
     }
 
     @Override
-    public void onClickChange(RobotsMouseEvent e) {
+    public void onReleaseChange(RobotsMouseEvent e) {
         if (lines.size() > 0) {
             List<Pair<Point, Point>> copyLines = new ArrayList<>(lines);
-            copyLines.add(new Pair<>(e.getF(), e.getS()));
+            copyLines.add(new Pair<>(e.f(), e.s()));
             Map<Pair<Point, Point>, Set<Pair<Point, Point>>> intersectingLines = new HashMap<>();
             for (Pair<Point, Point> line : copyLines) {
                 for (Pair<Point, Point> line1 : copyLines) {
@@ -144,12 +138,18 @@ public class GameVisualizer extends JPanel implements RobotsMouseListener {
                                                      .toList();
 
             if (figures.isEmpty()) {
-                lines.add(new Pair<>(e.getF(), e.getS()));
+                lines.add(new Pair<>(e.f(), e.s()));
             }
         } else {
-            lines.add(new Pair<>(e.getF(), e.getS()));
+            lines.add(new Pair<>(e.f(), e.s()));
         }
         EventQueue.invokeLater(this::repaint);
+    }
+
+    @Override
+    public void onClickChange(RobotsMouseEvent e) {
+        target.setTargetPosition(e.f());
+        repaint();
     }
 
     private Set<Pair<Point, Point>> add(Set<Pair<Point, Point>> set, Pair<Point, Point> el) {
